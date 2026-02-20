@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Observability Shortlist Scorecard — Sifflet</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --razzmatazz: #E8003D;
+    --ocean: #0066CC;
+    --ocean-dark: #004A99;
+    --ink: #0A0F1E;
+    --ink-80: #1A2033;
+    --slate: #6B7280;
+    --silver: #E5E8EF;
+    --ice: #F4F6FA;
+    --white: #FFFFFF;
+    --green: #00875A;
+    --amber: #D97706;
+    --red: #DC2626;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'DM Mono', 'Courier New', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--ice);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Layout */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  .container-wide { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  /* Typography */
+  .serif { font-family: var(--serif); }
+  .mono { font-family: var(--mono); }
+  h1.display { font-family: var(--serif); font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; color: var(--ink); }
+  h2 { font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.2; }
+  h3 { font-size: 1rem; font-weight: 600; letter-spacing: 0.02em; }
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 4px; font-family: var(--sans);
+    font-size: 0.9rem; font-weight: 500; cursor: pointer;
+    border: 1.5px solid transparent; transition: all 0.15s ease; text-decoration: none;
+  }
+  .btn-primary { background: var(--razzmatazz); color: #fff; border-color: var(--razzmatazz); }
+  .btn-primary:hover { background: #c4002f; border-color: #c4002f; }
+  .btn-secondary { background: transparent; color: var(--ink); border-color: var(--ink); }
+  .btn-secondary:hover { background: var(--ink); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--ocean); border-color: transparent; padding: 8px 12px; }
+  .btn-ghost:hover { background: var(--ice); }
+  .btn-sm { padding: 8px 16px; font-size: 0.82rem; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  /* Cards */
+  .card { background: var(--white); border: 1px solid var(--silver); border-radius: 8px; padding: 24px; }
+  .card-flat { background: var(--white); border: 1px solid var(--silver); border-radius: 4px; }
+  /* Form elements */
+  .form-label { font-size: 0.82rem; font-weight: 500; color: var(--slate); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--silver);
+    border-radius: 4px; font-family: var(--sans); font-size: 0.92rem;
+    background: var(--white); color: var(--ink); outline: none; transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: var(--ocean); }
+  .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  /* Progress bar */
+  .progress-bar { height: 3px; background: var(--silver); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--razzmatazz); border-radius: 2px; transition: width 0.4s ease; }
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--silver); margin: 24px 0; }
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 2px; font-size: 0.75rem; font-weight: 500; font-family: var(--mono); }
+  .badge-green { background: #DCFCE7; color: #166534; }
+  .badge-amber { background: #FEF3C7; color: #92400E; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+  .badge-gray { background: var(--silver); color: var(--slate); }
+  /* Tooltip */
+  .tooltip-wrap { position: relative; display: inline-flex; }
+  .tooltip-icon { width: 16px; height: 16px; border-radius: 50%; background: var(--silver); color: var(--slate); font-size: 0.65rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; cursor: help; }
+  .tooltip-box { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; font-size: 0.78rem; line-height: 1.5; padding: 10px 14px; border-radius: 4px; width: 260px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.15s; white-space: normal; }
+  .tooltip-wrap:hover .tooltip-box { opacity: 1; }
+  /* Score circle */
+  .score-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+  /* Risk items */
+  .risk-item { border-left: 3px solid var(--red); padding: 12px 16px; background: #FFF5F5; border-radius: 0 4px 4px 0; margin-bottom: 8px; }
+  .risk-item.medium { border-color: var(--amber); background: #FFFBEB; }
+  .risk-item.low { border-color: var(--ocean); background: #EFF6FF; }
+  /* Answer grid */
+  .answer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 6px; }
+  .answer-btn {
+    padding: 8px 6px; text-align: center; border: 1.5px solid var(--silver);
+    border-radius: 4px; font-size: 0.75rem; font-weight: 500; cursor: pointer;
+    background: var(--white); color: var(--slate); transition: all 0.1s; font-family: var(--mono);
+    line-height: 1.3;
+  }
+  .answer-btn:hover { border-color: var(--ocean); color: var(--ocean); }
+  .answer-btn.selected-3 { background: #D1FAE5; border-color: var(--green); color: #065F46; }
+  .answer-btn.selected-2 { background: #FEF3C7; border-color: #B45309; color: #92400E; }
+  .answer-btn.selected-0 { background: #FEE2E2; border-color: #B91C1C; color: #991B1B; }
+  .answer-btn.selected-u { background: #F5F3FF; border-color: #7C3AED; color: #5B21B6; }
+  /* Nav */
+  .top-nav { background: var(--white); border-bottom: 1px solid var(--silver); padding: 16px 0; position: sticky; top: 0; z-index: 50; }
+  /* Section tabs */
+  .section-tab { padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.82rem; font-weight: 500; color: var(--slate); border: 1.5px solid transparent; transition: all 0.15s; white-space: nowrap; }
+  .section-tab:hover { color: var(--ink); background: var(--ice); }
+  .section-tab.active { color: var(--ink); border-color: var(--ink); background: var(--white); }
+  .section-tab.complete { color: var(--green); border-color: transparent; }
+  /* Table */
+  .comparison-table { width: 100%; border-collapse: collapse; }
+  .comparison-table th { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--slate); padding: 12px 16px; border-bottom: 2px solid var(--silver); text-align: left; }
+  .comparison-table td { padding: 12px 16px; border-bottom: 1px solid var(--silver); font-size: 0.88rem; vertical-align: middle; }
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table tbody tr:hover { background: var(--ice); }
+  /* Score bar */
+  .score-bar-track { height: 8px; background: var(--silver); border-radius: 4px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.4s ease forwards; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* Responsive */
+  @media (max-width: 640px) {
+    .answer-grid { grid-template-columns: repeat(3, 1fr); }
+    .hide-mobile { display: none; }
+  }
+  /* Print */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; }
+  }
+  /* Vendor color dots */
+  .vendor-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  /* Sticky sidebar */
+  .sticky-sidebar { position: sticky; top: 80px; }
+  /* Question block */
+  .question-block { border: 1px solid var(--silver); border-radius: 6px; background: var(--white); overflow: hidden; margin-bottom: 12px; }
+  .question-header { padding: 14px 16px; border-bottom: 1px solid var(--silver); background: var(--ice); display: flex; align-items: flex-start; gap: 8px; }
+  .question-body { padding: 16px; }
+  /* What to ask */
+  .ask-box { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 4px; padding: 10px 14px; font-size: 0.8rem; color: #1E40AF; margin-top: 12px; }
+  /* Landing hero */
+  .hero-pattern { background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(0,102,204,0.03) 20px, rgba(0,102,204,0.03) 21px); }
+  .stat-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--white); border: 1px solid var(--silver); border-radius: 100px; padding: 6px 14px; font-size: 0.82rem; color: var(--slate); }
+  /* Override for results share area */
+  .share-box { background: var(--ink); color: #fff; border-radius: 6px; padding: 20px; }
+  .share-box textarea { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 4px; padding: 12px; font-family: var(--mono); font-size: 0.8rem; resize: none; width: 100%; outline: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef, useMemo } = React;
+
+// ============================================================
+// CONTENT CONFIG
+// ============================================================
+const CONFIG = {
+  buyersGuideBase: "https://www.siffletdata.com/buyers-guide",
+  chapterUrls: {
+    businessContext: "",
+    detectionPrecision: "",
+    triageContext: "",
+    resolutionVelocity: "",
+    endToEndCoverage: "",
+    enterpriseFit: "",
+    redFlags: "",
+    greenFlags: "",
+  },
+  sections: [
+    { id:"A", label:"Trust & Business Context", weight:22, threshold:60, chapterKey:"businessContext",
+      intro:"The Buyer's Guide opens with a hard question: does your observability tool serve the business, or only the data team? Most platforms stop at the technical layer — they tell engineers what broke, but leave everyone else in the dark. Section A tests whether a vendor can connect data failures to business outcomes, serve multiple personas, and build the kind of trust that makes data a reliable foundation for decisions." },
+    { id:"B", label:"Detection with Precision", weight:16, threshold:55, chapterKey:"detectionPrecision",
+      intro:"Detection is necessary — but the Buyer's Guide calls it table stakes. Every serious vendor monitors freshness, volume, and schema drift. The real question is whether detection is intelligent: does it scale without manual configuration, reduce noise over time, and cover both batch and streaming patterns? Section B helps you separate vendors who have detection from those who have mastered it." },
+    { id:"C", label:"Triage with Context", weight:18, threshold:60, chapterKey:"triageContext",
+      intro:"The Buyer's Guide frames triage as the moment that separates observability from monitoring in disguise. An alert fires — now what? Weak tools dump you into a log viewer. Strong tools immediately surface what is affected, who needs to act, how urgent it is, and likely root cause. Section C measures whether triage is a manual investigation or an accelerated, context-rich workflow." },
+    { id:"D", label:"Resolution with Velocity", weight:16, threshold:55, chapterKey:"resolutionVelocity",
+      intro:"Detection without resolution is noise. The Buyer's Guide argues that resolution is where most tools abandon you — they hand off to Slack or Jira and disappear. True observability supports the full loop inside the platform: collaborative response, stakeholder communication, playbooks, and a closed incident record. Section D tests whether the vendor sees resolution as a core capability, not an afterthought." },
+    { id:"E", label:"End-to-End Coverage", weight:14, threshold:55, chapterKey:"endToEndCoverage",
+      intro:"Data issues don't respect boundaries. A schema change upstream can break a revenue dashboard downstream without warning. The Buyer's Guide emphasizes that true observability means visibility across the entire data lifecycle — from ingestion through transformation, orchestration, BI consumption, and ML features — in a single connected product experience. Section E tests the real breadth of a vendor's coverage." },
+    { id:"F", label:"Enterprise Fit", weight:14, threshold:50, chapterKey:"enterpriseFit",
+      intro:"A tool that works for 50 tables rarely works for 50,000. The Buyer's Guide reminds buyers that enterprise fit is about more than features — it's about whether the platform can scale with your organization, meet your security requirements, integrate with your existing workflows, and be managed like production infrastructure. Section F examines the operational and organizational readiness of each vendor." },
+  ],
+  choices: [
+    { value:3, label:"Solid — present and works well in most scenarios", short:"Solid", cls:"selected-3" },
+    { value:2, label:"Basic — present but limited, partial, or manual", short:"Basic", cls:"selected-2" },
+    { value:0, label:"Missing — not present or not demonstrated", short:"Missing", cls:"selected-0" },
+    { value:"U", label:"Unknown — not sure yet, need to validate", short:"Unknown", cls:"selected-u" },
+  ],
+  glossary: {
+    "business context": "Connecting data incidents to the business processes, revenue impact, or stakeholders they affect — not just the technical table or pipeline.",
+    "trust signals": "Indicators that non-technical users — analysts, executives — can understand and act on, without reading logs or querying databases.",
+    "monitoring in disguise": "A tool that fires technical alerts without explaining business impact, serving engineers only, not the broader organization.",
+    "technical signals": "Freshness, volume anomalies, schema changes, distribution drift, and query performance — the raw inputs to observability.",
+    "contextual triage": "Automatically surfacing what is affected, who owns it, how urgent it is, and likely root cause — reducing MTTR without manual investigation.",
+    "business-aligned resolution": "Closing the loop on incidents with communication to business stakeholders, not just pinging an engineering Slack channel.",
+    "stakeholder mapping": "Knowing which dashboards, reports, or decisions depend on a failing dataset, and who needs to know about it.",
+    "priority scoring": "Ranking incidents by business consequence — revenue impact, executive visibility, regulatory exposure — not only technical severity.",
+    "end-to-end observability": "Covering the full data lifecycle: ingestion, transformation, orchestration, BI consumption, and ML feature pipelines in one product.",
+    "alert fatigue": "When the volume of alerts exceeds a team's capacity to respond, leading to desensitization and missed critical incidents.",
+    "table stakes": "Detection of freshness, volume, schema, and distribution — necessary but not sufficient. Every serious vendor does this.",
+    "good enough trap": "Accepting a tool that catches technical issues but fails to contextualize them for business impact, creating hidden risk.",
+  },
+  questions: [
+
+    // ── SECTION A · Trust & Business Context ────────────────────────────────
+    { id:"A1", section:"A", critical:true,
+      prompt:"Does every incident surface business impact immediately — which dashboards, reports, and decisions are at risk — without requiring engineers to manually investigate first?",
+      tooltip:"business context",
+      whatToAsk:"Ask the vendor to demo a live or recorded critical table failure end-to-end. You need to see: (1) downstream dashboards and reports affected shown automatically, (2) an urgency score tied to business consequence rather than technical severity, (3) an AI-generated plain-language summary of the incident that a non-technical stakeholder can act on. Tools that only show row counts and table names are monitoring, not observability.",
+      redFlags:["alerts without business impact","no mapping between data issues and business processes"],
+      greenFlags:["business contextualized alerts","stakeholder aware monitoring"],
+      chapterKey:"businessContext" },
+
+    { id:"A2", section:"A", critical:false,
+      prompt:"Does the platform offer actionable lineage — not just a visual diagram — where every node shows live quality status, ownership, and recent anomalies during an active investigation?",
+      tooltip:"stakeholder mapping",
+      whatToAsk:"This is where most vendors fail in practice. During a simulated incident, navigate the lineage graph. At every node ask: can I see current freshness status, the last quality check result, who owns this asset, and whether there are open incidents? If clicking a node only shows table schema and metadata, the lineage is decorative, not investigative. Also ask: does lineage show dbt model config block details, or only the dependency graph?",
+      redFlags:["no mapping between data issues and business processes"],
+      greenFlags:["business contextualized alerts","stakeholder aware monitoring"],
+      chapterKey:"businessContext" },
+
+    { id:"A3", section:"A", critical:false,
+      prompt:"Can business users — analysts, finance teams, dashboard owners — understand and act on incidents without engineering involvement, using the tools they already work in?",
+      tooltip:"trust signals",
+      whatToAsk:"Show the experience a VP of Finance or Head of Revenue Operations would have during a data incident. Can they see what broke, what decisions are affected, and what the resolution status is — entirely without SQL, log access, or asking an engineer? Is there a BI-native plugin (Power BI, Tableau, Looker) that surfaces quality warnings inside dashboards? Tools that require engineers to relay information to business users are creating a bottleneck, not solving one.",
+      redFlags:["single persona design for engineers only","technical metrics only"],
+      greenFlags:["cross functional usability","business contextualized alerts"],
+      chapterKey:"businessContext" },
+
+    { id:"A4", section:"A", critical:false,
+      prompt:"Are incident notifications genuinely descriptive — explaining what broke, what is affected, and what action is needed — or are they technical payloads that only engineers can decode?",
+      tooltip:"monitoring in disguise",
+      whatToAsk:"Show an actual Teams or Slack notification from a recent production incident. Read it aloud as if you were the Head of Analytics receiving it at 9am. Does it tell you what decision or report is at risk, who is handling it, and what the estimated resolution is — or does it contain only table names, row counts, and pipeline identifiers? Ask: can notification content differ based on whether the recipient is an engineer or a business stakeholder?",
+      redFlags:["alerts without business impact","single persona design for engineers only"],
+      greenFlags:["business contextualized alerts","stakeholder aware monitoring"],
+      chapterKey:"businessContext" },
+
+    { id:"A5", section:"A", critical:false,
+      prompt:"Does the platform handle planned operational events — backfills, seasonal spikes, public holidays, schema migrations — without generating false alerts that burn team trust?",
+      tooltip:"good enough trap",
+      whatToAsk:"Ask specifically: 'If we run a 3-day historical reload this weekend, what happens to alert volume on Monday?' A platform that cannot distinguish planned events from genuine anomalies will either drown your team in false positives or force you to disable monitoring during maintenance windows — both are unacceptable in production. Ask to see holiday-aware monitoring configuration and backfill suppression logic.",
+      redFlags:["alerts without business impact"],
+      greenFlags:["business contextualized alerts"],
+      chapterKey:"businessContext" },
+
+    // ── SECTION B · Detection with Precision ────────────────────────────────
+    { id:"B1", section:"B", critical:false,
+      prompt:"Does the platform support column-level monitoring — cardinality, statistical distribution, email/phone/UUID format validation — not just table-level freshness and row counts?",
+      tooltip:"technical signals",
+      whatToAsk:"Ask the vendor to configure a column-level monitor live: cardinality on a customer ID column, regex validation on an email field, and standard deviation on a revenue metric. Tools that only operate at table level (freshness, row count, table size) leave the majority of data quality issues invisible. Also ask: can conditional monitoring be applied — for example, only monitoring rows where status = 'active'?",
+      redFlags:["alerts without business impact"],
+      greenFlags:[],
+      chapterKey:"detectionPrecision" },
+
+    { id:"B2", section:"B", critical:false,
+      prompt:"Custom SQL monitors: can you write arbitrary SQL checks with flexible scheduling (not just hourly), AI assistance for query writing, and human-readable alert messages when they fire?",
+      tooltip:"technical signals",
+      whatToAsk:"Build a custom SQL monitor live. Three things to verify: (1) schedule flexibility — can it run every 4 hours or on a cron expression, rather than being locked to hourly intervals? (2) AI assistance — does the platform help write or validate the SQL? (3) alert quality — when the monitor fires, does the notification describe what was checked and what threshold was breached in plain language, or is it a raw technical output?",
+      redFlags:[],
+      greenFlags:[],
+      chapterKey:"detectionPrecision" },
+
+    { id:"B3", section:"B", critical:false,
+      prompt:"Does freshness monitoring let you choose the specific timestamp field, set sub-hourly check intervals, and reliably alert when data stops arriving — not just when the next scheduled check runs?",
+      tooltip:"technical signals",
+      whatToAsk:"Configure a freshness monitor live on a table you own. Verify: (1) can you select the exact timestamp column rather than relying on the platform's default? (2) what is the minimum check interval — 10 minutes, 30 minutes, or only hourly? (3) if data stops arriving completely, is an alert fired immediately or only at the next scheduled run? A monitor that stays silent for an hour while data is missing is not production-grade freshness monitoring.",
+      redFlags:[],
+      greenFlags:[],
+      chapterKey:"detectionPrecision" },
+
+    { id:"B4", section:"B", critical:false,
+      prompt:"Can ML anomaly detection be validated on your real production data during POC — or does the vendor only demo it on pre-seeded synthetic datasets?",
+      tooltip:"alert fatigue",
+      whatToAsk:"Ask to run the anomaly detection on a table from your own environment during the POC — not a vendor-controlled demo dataset. Verify: can thresholds and model sensitivity be adjusted based on real results? Can you confirm the model would have caught historical known incidents? Platforms that cannot be tested on real data before go-live will almost always require significant tuning post-deployment, costing weeks of engineering time.",
+      redFlags:["alerts without business impact"],
+      greenFlags:[],
+      chapterKey:"detectionPrecision" },
+
+    // ── SECTION C · Triage with Context ─────────────────────────────────────
+    { id:"C1", section:"C", critical:true,
+      prompt:"When an alert fires, does the platform immediately surface blast radius, ownership, urgency, and likely root cause — or does investigation still require manual log searching and cross-tool correlation?",
+      tooltip:"contextual triage",
+      whatToAsk:"Show the triage screen immediately after an alert fires — before anything has been manually investigated. Count the clicks to answer four questions: (1) which downstream reports and decisions are affected? (2) who is the data owner responsible? (3) how urgent is this relative to other open incidents? (4) what is the most likely root cause? Every click that requires leaving the platform or opening a query editor is time your team cannot afford during a 2am incident.",
+      redFlags:["no mapping between data issues and business processes","technical metrics only"],
+      greenFlags:["business contextualized alerts","stakeholder aware monitoring","collaborative incident resolution"],
+      chapterKey:"triageContext" },
+
+    { id:"C2", section:"C", critical:false,
+      prompt:"Does the platform correlate data quality incidents with upstream orchestration events — dbt run failures, Airflow DAG errors, schema changes — automatically, without manual log searching?",
+      tooltip:"contextual triage",
+      whatToAsk:"Show how a failed dbt model run is correlated with a downstream data quality alert. Is this correlation automatic, or does an engineer need to cross-reference Airflow logs manually? Ask: 'If an Airflow DAG fails at 3am and causes a data quality issue, will the incident view already show the failed DAG as a likely root cause when the on-call engineer opens it?' Platforms that require manual log correlation are adding 20-40 minutes to every MTTR.",
+      redFlags:[],
+      greenFlags:["collaborative incident resolution"],
+      chapterKey:"triageContext" },
+
+    { id:"C3", section:"C", critical:false,
+      prompt:"Does lineage span the full stack — from raw source tables through intermediate dbt models to final BI dashboards — and does it show config block details from dbt models, not just the dependency graph?",
+      tooltip:"end-to-end observability",
+      whatToAsk:"Trace a specific incident from a source table all the way to a downstream dashboard. Ask: 'Show me the dbt model config block for a model in this lineage — can I see the materialization strategy, tags, and description without leaving the platform?' Also ask: 'Show me lineage between two intermediate models that aren't directly connected to a final BI asset.' Lineage that stops at the data warehouse boundary is incomplete for modern stacks.",
+      redFlags:[],
+      greenFlags:["business contextualized alerts"],
+      chapterKey:"triageContext" },
+
+    { id:"C4", section:"C", critical:false,
+      prompt:"Does cross-table comparison support flexible segmentation without SQL, and does it visualise differences in a way that immediately identifies which records or segments diverge?",
+      tooltip:"priority scoring",
+      whatToAsk:"Configure a cross-table comparison between two datasets live. Verify: (1) can segmentation by region, product, or date be applied without writing SQL code? (2) when differences are found, does the visualisation immediately show which segment or record type is diverging — or do you need to interpret raw numbers? (3) can left joins and outer joins be configured for the comparison? Platforms that require SQL for every segmented comparison will be abandoned by data teams within 6 months.",
+      redFlags:["technical metrics only","no mapping between data issues and business processes"],
+      greenFlags:["business contextualized alerts"],
+      chapterKey:"triageContext" },
+
+    // ── SECTION D · Resolution with Velocity ────────────────────────────────
+    { id:"D1", section:"D", critical:true,
+      prompt:"Is the full incident lifecycle — detection, AI-assisted triage, assignment, stakeholder communication, and closure — managed inside the platform, or does it fragment across Slack, Jira, and email?",
+      tooltip:"business-aligned resolution",
+      whatToAsk:"Walk through a complete incident lifecycle without leaving the product: fire an alert → assign to an owner → add investigation notes → notify affected stakeholders with a human-readable summary → mark resolved with root cause recorded. Ask specifically: does the platform generate an AI summary of the incident that can be shared directly with a business stakeholder, or does someone need to write that email manually after resolution?",
+      redFlags:["no cross team collaboration support"],
+      greenFlags:["collaborative incident resolution","business-aligned resolution"],
+      chapterKey:"resolutionVelocity" },
+
+    { id:"D2", section:"D", critical:false,
+      prompt:"Does Slack or Teams integration support bidirectional incident management — assignment, acknowledgement, severity updates — from within the messaging tool, without returning to the platform?",
+      tooltip:"business-aligned resolution",
+      whatToAsk:"Show a Teams or Slack notification from a real incident. From within that notification, demonstrate: assigning the incident to a team member, updating severity, and adding a comment — all without clicking back into the platform. Is there a native plugin with structured actions, or only a webhook that sends a text message? Ask about Jira Cloud specifically — many vendors quietly support only Jira Server or email-to-Jira, which loses assignment metadata and audit trail.",
+      redFlags:["single persona design for engineers only","no cross team collaboration support"],
+      greenFlags:["cross functional usability","collaborative incident resolution"],
+      chapterKey:"resolutionVelocity" },
+
+    { id:"D3", section:"D", critical:false,
+      prompt:"Does the platform support SSO via Okta or other enterprise identity providers — and does it offer granular RBAC that controls what different personas can see, configure, and act on?",
+      tooltip:"business-aligned resolution",
+      whatToAsk:"Show Okta SSO integration in action — is it supported natively or via SAML workaround? Then show RBAC: configure a role for a data engineer (can create monitors, manage incidents), a business analyst (can view incidents, cannot modify monitors), and a VP (read-only dashboard access). Ask: can row-level or dataset-level permissions restrict what data a specific user can see within the platform? For regulated industries, this is non-negotiable.",
+      redFlags:[],
+      greenFlags:["collaborative incident resolution"],
+      chapterKey:"resolutionVelocity" },
+
+    { id:"D4", section:"D", critical:false,
+      prompt:"Is Monitoring-as-Code fully supported — monitors defined in version-controlled YAML, deployed via CLI, with round-trip export from the UI — without wrapping or replacing your existing dbt executable?",
+      tooltip:"end-to-end observability",
+      whatToAsk:"Show the CLI workflow: define a monitor in YAML, deploy it, then export an existing UI-created monitor back to YAML for version control. Ask critically: 'Does your dbt integration wrap the dbt executable or call it as a subprocess?' Platforms that wrap the dbt executable introduce a single point of failure — if the wrapper breaks, your entire dbt pipeline breaks. Also ask about dependency version pinning: which exact dbt versions are supported and documented?",
+      redFlags:[],
+      greenFlags:[],
+      chapterKey:"resolutionVelocity" },
+
+    // ── SECTION E · End-to-End Coverage ─────────────────────────────────────
+    { id:"E1", section:"E", critical:false,
+      prompt:"Does Airflow integration work with enterprise authentication patterns — GCP proxy auth, token-based auth, IAM roles — without requiring basic auth or a custom workaround?",
+      tooltip:"end-to-end observability",
+      whatToAsk:"This is a critical integration question that eliminates vendors during POC. Ask directly: 'If our Airflow instance sits behind a GCP Identity-Aware Proxy, does your integration support that authentication pattern natively — or does it require basic username/password auth?' Also ask: can a failing data quality monitor block a downstream Airflow task from executing, rather than only sending a notification? Show this working live — passive alerting is not the same as active pipeline protection.",
+      redFlags:["no mapping between data issues and business processes"],
+      greenFlags:["business outcome tracking"],
+      chapterKey:"endToEndCoverage" },
+
+    { id:"E2", section:"E", critical:false,
+      prompt:"Does the dbt integration provide selective, granular control over which artifacts are ingested — avoiding a blanket 'send everything' approach that introduces operational risk?",
+      tooltip:"end-to-end observability",
+      whatToAsk:"Ask: 'Can we control which dbt projects, models, or tags send artifacts to your platform, and when?' Platforms that ingest all dbt runs without selective control create noise and make it impossible to stage rollouts. Also ask: does the integration show dbt test results correlated with data quality incidents, so that a failing dbt test and a quality alert are surfaced together in the incident context rather than requiring manual cross-referencing?",
+      redFlags:[],
+      greenFlags:["business contextualized alerts","stakeholder aware monitoring"],
+      chapterKey:"endToEndCoverage" },
+
+    { id:"E3", section:"E", critical:false,
+      prompt:"Does the platform surface data quality warnings inside BI tools natively — embedded in dashboards, not requiring users to switch to a separate observability interface?",
+      tooltip:"end-to-end observability",
+      whatToAsk:"Show the Power BI, Tableau, or Looker integration. Specifically: do data quality warnings appear as embedded indicators on dashboard tiles or dataset sources, so that a business user sees the alert in the tool they are already using? Or must they navigate to a separate platform to check quality status? Also: does the integration cover all workspaces and datasets, or only a configured subset? Ask for a live demo on a real workspace, not a sandbox.",
+      redFlags:["no cross team collaboration support"],
+      greenFlags:["collaborative incident resolution","business-aligned resolution"],
+      chapterKey:"endToEndCoverage" },
+
+    // ── SECTION F · Enterprise Fit & Platform Readiness ─────────────────────
+    { id:"F1", section:"F", critical:false,
+      prompt:"Is pricing transparent and predictable — with no hidden cloud compute costs — and is there cost-overrun protection to prevent billing surprises as your data estate grows?",
+      tooltip:"end-to-end observability",
+      whatToAsk:"Ask for a complete cost breakdown including any cloud compute (Databricks, BigQuery, Snowflake) costs billed separately from the platform licence. Ask: 'Is our base rate contractually fixed with no reduction option if usage drops?' and 'Is there a cost-overrun warning or cap feature?' Get pricing across the full range — minimum commitment to maximum projected cost at 2x your current table count. Pricing opacity at this stage is a reliable indicator of pricing opacity post-contract.",
+      redFlags:[],
+      greenFlags:[],
+      chapterKey:"enterpriseFit" },
+
+    { id:"F2", section:"F", critical:false,
+      prompt:"Enterprise security: SOC 2 Type II certification, granular RBAC, Okta/SAML SSO, queryable audit logs, and deployment options for regulated environments (VPC, on-prem, GCP private).",
+      tooltip:"trust signals",
+      whatToAsk:"For each of the following, ask for documentation or a live demo rather than a verbal confirmation: (1) SOC 2 Type II report — when was it last renewed? (2) RBAC — show permissions for a data engineer vs. a read-only business stakeholder in the same environment. (3) Audit log — can it be queried or exported for compliance review? (4) Deployment — for regulated industries or those with data residency requirements, is private VPC or on-prem deployment available, and what is the provisioning timeline?",
+      redFlags:[],
+      greenFlags:[],
+      chapterKey:"enterpriseFit" },
+
+    { id:"F3", section:"F", critical:false,
+      prompt:"How responsive and technically capable is the support team during POC — with real-time access, not just email ticketing — and can they resolve integration blockers within hours rather than days?",
+      tooltip:"business-aligned resolution",
+      whatToAsk:"The POC support experience is the most reliable predictor of post-sale support quality. Ask: 'During POC, will we have a dedicated Slack Connect channel with a named technical contact?' Ask for examples of a complex integration issue a recent customer faced — what was the blocker, and how long did it take to resolve? Time-zone alignment matters: if your team is in Paris and the vendor's support is US-East only, expect 24-hour response cycles on critical blockers.",
+      redFlags:[],
+      greenFlags:["collaborative incident resolution"],
+      chapterKey:"enterpriseFit" },
+
+    { id:"F4", section:"F", critical:false,
+      prompt:"API completeness and Terraform support: can monitors, connections, RBAC, and notification rules all be managed as infrastructure-as-code via a publicly documented, versioned API?",
+      tooltip:"end-to-end observability",
+      whatToAsk:"Show the public API documentation — is it versioned and does it cover all platform objects (monitors, connections, users, notification rules)? Demonstrate: create a monitor via API, update a permission rule, and show the Terraform provider managing an RBAC configuration. Ask: 'Is the Terraform provider on the public Terraform Registry, and how are breaking API changes communicated?' Platforms with undocumented or incomplete APIs will block your DataOps maturity roadmap within 12 months.",
+      redFlags:[],
+      greenFlags:[],
+      chapterKey:"enterpriseFit" },
+  ],
+  vendorColors: ["#E8003D","#0066CC","#00875A","#D97706","#7C3AED","#0F766E"],
+  riskLabels: { high:"HIGH", medium:"MEDIUM", low:"LOW" },
+};
+
+// ============================================================
+// SCORING UTILITIES
+// ============================================================
+function scoreVendor(vendorAnswers, sections, questions) {
+  const sectionScores = {};
+  const sectionMaxes = {};
+  let totalWeightedScore = 0;
+  let totalWeight = 0;
+  let unknownCount = 0;
+  let criticalUnknownCount = 0;
+
+  sections.forEach(sec => {
+    const secQs = questions.filter(q => q.section === sec.id);
+    let raw = 0, maxRaw = 0, unknowns = 0;
+    secQs.forEach(q => {
+      const ans = vendorAnswers[q.id];
+      if (ans === "U" || ans === undefined || ans === null) {
+        unknowns++;
+        unknownCount++;
+        if (q.critical) criticalUnknownCount++;
+      } else {
+        raw += Number(ans);
+      }
+      maxRaw += 3;
+    });
+    const pct = maxRaw > 0 ? (raw / maxRaw) * 100 : 0;
+    sectionScores[sec.id] = Math.round(pct);
+    sectionMaxes[sec.id] = maxRaw;
+    totalWeightedScore += (pct / 100) * sec.weight;
+    totalWeight += sec.weight;
+  });
+
+  const total = totalWeight > 0 ? Math.round((totalWeightedScore / totalWeight) * 100) : 0;
+  let confidence = 100 - (2 * unknownCount) - (6 * criticalUnknownCount);
+  confidence = Math.max(10, Math.min(100, confidence));
+
+  return { total, confidence, sectionScores, unknownCount, criticalUnknownCount };
+}
+
+function generateRisks(vendorName, vendorAnswers, scores, sections, questions, config) {
+  const risks = [];
+
+  // Low section scores
+  sections.forEach(sec => {
+    const pct = scores.sectionScores[sec.id];
+    if (pct !== undefined && pct < sec.threshold) {
+      risks.push({
+        id: `risk-sec-${sec.id}`,
+        severity: pct < 30 ? "high" : pct < 45 ? "medium" : "low",
+        title: `${sec.label} score is below threshold (${pct}/100)`,
+        business: `Weak coverage in ${sec.label.toLowerCase()} creates operational blind spots. Teams may miss critical incidents or spend excess time on manual investigation.`,
+        validate: `Request a live demo focused specifically on ${sec.label.toLowerCase()} workflows. Ask for customer references from companies at similar scale.`,
+        proof: "Product demo recording, customer case study, or reference call",
+        chapterKey: sec.chapterKey,
+        section: sec.id,
+      });
+    }
+  });
+
+  // Critical unknowns
+  questions.filter(q => q.critical).forEach(q => {
+    const ans = vendorAnswers[q.id];
+    if (ans === "U" || ans === undefined) {
+      risks.push({
+        id: `risk-crit-${q.id}`,
+        severity: "high",
+        title: `Critical capability not validated: ${q.prompt.substring(0, 60)}...`,
+        business: "Unknown status on a critical capability means you cannot confidently commit to this vendor without further validation.",
+        validate: q.whatToAsk,
+        proof: "Live product demo on this specific workflow",
+        chapterKey: q.chapterKey,
+        section: q.section,
+      });
+    }
+  });
+
+  // Red flag answers (score 0 or 1 on red-flag-tagged questions)
+  questions.forEach(q => {
+    if (q.redFlags && q.redFlags.length > 0) {
+      const ans = vendorAnswers[q.id];
+      if (ans !== undefined && ans !== "U" && Number(ans) === 0) {
+        q.redFlags.forEach(flag => {
+          if (!risks.find(r => r.id === `risk-rf-${q.id}-${flag}`)) {
+            risks.push({
+              id: `risk-rf-${q.id}-${flag}`,
+              severity: Number(ans) === 0 ? "high" : "medium",
+              title: `Red flag: ${flag}`,
+              business: redFlagImpact(flag),
+              validate: q.whatToAsk,
+              proof: "Customer reference demonstrating this has been resolved at scale",
+              chapterKey: q.chapterKey,
+              section: q.section,
+            });
+          }
+        });
+      }
+    }
+  });
+
+  return risks.slice(0, 10); // cap at 10 risks
+}
+
+function redFlagImpact(flag) {
+  const impacts = {
+    "alerts without business impact": "Technical alerts without business context increase MTTR and erode trust. Business users cannot self-serve, creating bottlenecks on the data team.",
+    "no mapping between data issues and business processes": "Without linking data failures to business processes, triage is guesswork. On-call engineers cannot prioritize, and SLA breaches go undetected.",
+    "single persona design for engineers only": "Tools designed only for engineers exclude analysts and business users, limiting ROI and creating silos in incident response.",
+    "no cross team collaboration support": "Incidents require coordination between data producers and consumers. Without native collaboration, resolution happens in email or Slack with no audit trail.",
+    "technical metrics only, no business outcome tracking": "Tracking bytes and rows without business outcomes means you cannot demonstrate data quality ROI or defend observability investment to leadership.",
+  };
+  return impacts[flag] || "This red flag pattern is associated with tools that fail to deliver observability at scale.";
+}
+
+function generateStrengths(vendorAnswers, scores, sections, questions) {
+  const strengths = [];
+  sections.forEach(sec => {
+    if (scores.sectionScores[sec.id] >= 75) {
+      strengths.push(`Strong ${sec.label.toLowerCase()} capabilities (${scores.sectionScores[sec.id]}/100)`);
+    }
+  });
+  questions.forEach(q => {
+    if (q.greenFlags && q.greenFlags.length > 0 && vendorAnswers[q.id] >= 2) {
+      q.greenFlags.forEach(flag => {
+        if (!strengths.find(s => s.includes(flag))) {
+          strengths.push(greenFlagStrength(flag));
+        }
+      });
+    }
+  });
+  return [...new Set(strengths)].slice(0, 6);
+}
+
+function greenFlagStrength(flag) {
+  const s = {
+    "business contextualized alerts": "Business-contextualized alerts reduce MTTR and increase cross-team trust",
+    "cross functional usability": "Cross-functional design enables business users to self-serve during incidents",
+    "stakeholder aware monitoring": "Stakeholder-aware routing ensures the right people are notified at the right time",
+    "collaborative incident resolution": "Collaborative resolution workflows reduce coordination overhead during incidents",
+    "business outcome tracking": "Business outcome tracking enables data quality ROI reporting to leadership",
+    "priority scoring": "Business-priority scoring reduces alert fatigue and focuses response on what matters",
+    "business-aligned resolution": "Resolution workflows aligned to business process reduce downstream impact duration",
+  };
+  return s[flag] || flag;
+}
+
+function generateNextQuestions(vendorAnswers, scores, sections, questions) {
+  const nqs = [];
+  const always = [
+    "Show me what happens — step by step — when a critical table stops updating at 11pm. Who gets notified, with what message, and how fast?",
+    "Walk me through an incident from first alert to closed resolution without leaving the product. Where does the workflow break?",
+    "Configure a freshness monitor live on a table we own, with a 10-minute check interval. If that's not possible, explain why.",
+  ];
+  nqs.push(...always);
+
+  sections.forEach(sec => {
+    if ((scores.sectionScores[sec.id] || 0) < 60) {
+      const secNqs = sectionNextQuestions[sec.id] || [];
+      nqs.push(...secNqs);
+    }
+  });
+
+  if (scores.unknownCount > 3) {
+    nqs.push("Provide a structured product demo agenda covering all six evaluation areas with documented answers.");
+  }
+
+  return [...new Set(nqs)].slice(0, 8);
+}
+
+const sectionNextQuestions = {
+  A: [
+    "Show me a live incident where a business user — not an engineer — can understand impact and status without SQL or log access.",
+    "Demo your Power BI or Tableau plugin showing data quality status embedded directly inside a dashboard tile.",
+    "Show me a Teams or Slack notification from a recent incident — is it human-readable or a technical payload?",
+  ],
+  B: [
+    "Configure a freshness monitor live and show me the minimum check interval. What happens if data stops arriving for 6 hours?",
+    "Show distribution monitoring covering mean, Q10, and Q90 in a single monitor — not three separate ones.",
+    "Demonstrate a custom SQL monitor with a flexible schedule (e.g. every 4 hours). Show what the alert message looks like when it fires.",
+    "Can anomaly detection be validated on historical data before we go live? Show this on a real table, not a demo environment.",
+  ],
+  C: [
+    "From first alert to 'I know who to wake up and why' — count the clicks and show me every screen.",
+    "Show me lineage between two intermediate dbt models that aren't directly connected to a final BI report.",
+    "Show how a failed Airflow run and a data quality alert are automatically correlated in the incident view.",
+    "Demo cross-table comparison with segment filtering — without writing SQL.",
+  ],
+  D: [
+    "Walk me through Jira Cloud integration specifically — not Jira Server or email-to-Jira. Show a ticket with full incident metadata.",
+    "Show me incident assignment directly from Teams — without clicking back into the platform.",
+    "Export an existing monitor to YAML, modify it, and redeploy via CLI. Is this round-trip documented and production-supported?",
+    "Show the full incident lifecycle — detection, assignment, investigation notes, stakeholder update, closure — without leaving the product.",
+  ],
+  E: [
+    "Show a quality monitor blocking a downstream Airflow task from executing when it fails — not just sending an alert.",
+    "Show Power BI data quality warnings appearing inside the BI workspace, covering all datasets, not just a subset.",
+    "Trace a schema change at source through a dbt model, an Airflow run, and a downstream Power BI report — all in one product.",
+  ],
+  F: [
+    "Give me the full pricing breakdown including cloud compute costs. What does cost overrun protection look like?",
+    "What is your response SLA for a P1 issue during POC? Show me a real support interaction from a recent customer.",
+    "Show the Terraform provider on the Registry — demonstrate managing monitors and RBAC as code.",
+  ],
+};
+
+// ============================================================
+// SHARE LINK UTILITIES
+// ============================================================
+function encodeState(state) {
+  try {
+    const json = JSON.stringify(state);
+    const encoded = btoa(encodeURIComponent(json));
+    return encoded;
+  } catch { return ""; }
+}
+
+function decodeState(encoded) {
+  try {
+    const json = decodeURIComponent(atob(encoded));
+    return JSON.parse(json);
+  } catch { return null; }
+}
+
+function buildShareUrl(state) {
+  const encoded = encodeState(state);
+  return `${window.location.origin}${window.location.pathname}?s=${encoded}`;
+}
+
+// ============================================================
+// ANALYTICS WRAPPER
+// ============================================================
+const analytics = {
+  track(event, props = {}) {
+    // Swap for Segment: window.analytics?.track(event, props)
+    console.log("[analytics]", event, props);
+  }
+};
+
+// ============================================================
+// HOOKS
+// ============================================================
+function useLocalStorage(key, initial) {
+  const [val, setVal] = useState(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : initial;
+    } catch { return initial; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  }, [key, val]);
+  return [val, setVal];
+}
+
+// ============================================================
+// COMPONENTS
+// ============================================================
+
+function Tooltip({ term, children }) {
+  const definition = CONFIG.glossary[term] || term;
+  return (
+    <span className="tooltip-wrap" style={{display:"inline-flex",alignItems:"center",gap:4}}>
+      {children}
+      <span className="tooltip-icon">?
+        <span className="tooltip-box">{definition}</span>
+      </span>
+    </span>
+  );
+}
+
+function ScoreBar({ value, color="#E8003D", height=8 }) {
+  return (
+    <div className="score-bar-track" style={{height}}>
+      <div className="score-bar-fill" style={{width:`${value}%`, background: color, height}} />
+    </div>
+  );
+}
+
+function ScoreCircle({ value, size=72, label, color="#E8003D" }) {
+  const r = (size/2) - 6;
+  const circ = 2 * Math.PI * r;
+  const dash = circ * (value/100);
+  return (
+    <div style={{textAlign:"center"}}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#E5E8EF" strokeWidth={5}/>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={5}
+          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+          transform={`rotate(-90 ${size/2} ${size/2})`}/>
+        <text x={size/2} y={size/2+2} textAnchor="middle" dominantBaseline="middle"
+          fontSize={size*0.22} fontWeight="600" fill={color} fontFamily="DM Mono">{value}</text>
+      </svg>
+      {label && <div style={{fontSize:"0.72rem",color:"#6B7280",marginTop:2,fontWeight:500}}>{label}</div>}
+    </div>
+  );
+}
+
+function ConfidenceDot({ value }) {
+  const color = value >= 70 ? "#00875A" : value >= 50 ? "#D97706" : "#DC2626";
+  const label = value >= 70 ? "High" : value >= 50 ? "Medium" : "Low";
+  return (
+    <span style={{display:"inline-flex",alignItems:"center",gap:5}}>
+      <span style={{width:8,height:8,borderRadius:"50%",background:color,display:"inline-block"}}/>
+      <span style={{fontSize:"0.78rem",color,fontWeight:600,fontFamily:"var(--mono)"}}>{label} confidence ({value})</span>
+    </span>
+  );
+}
+
+function RiskBadge({ severity }) {
+  const map = { high:"badge-red", medium:"badge-amber", low:"badge-blue" };
+  return <span className={`badge ${map[severity]||"badge-gray"}`}>{severity.toUpperCase()}</span>;
+}
+
+// ============================================================
+// LANDING PAGE
+// ============================================================
+function Landing({ onStart }) {
+  return (
+    <div style={{minHeight:"100vh",display:"flex",flexDirection:"column"}}>
+      {/* Nav */}
+      <nav style={{background:"#fff",borderBottom:"1px solid var(--silver)",padding:"16px 0"}}>
+        <div className="container" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:16}}>
+            <a href="https://www.siffletdata.com" target="_blank" style={{display:"flex",alignItems:"center",textDecoration:"none"}}>
+              <svg width="97" height="24" viewBox="0 0 97 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M39.0648 13.8059L36.9738 13.3158C35.4312 12.972 35.2558 12.2185 35.2558 11.6845C35.2558 10.7628 36.1038 10.1483 37.3613 10.1483C38.5091 10.1483 39.6058 10.6896 40.6147 11.7576L40.8559 12.0137L42.669 10.0898L42.4497 9.86298C41.0168 8.37066 39.3499 7.61719 37.4929 7.61719C36.1769 7.61719 35.0291 7.99027 34.0641 8.71448C33.0771 9.46063 32.5727 10.4921 32.5727 11.7796C32.5727 13.901 33.9252 15.2982 36.601 15.9346L38.5822 16.3955C40.41 16.8271 40.41 17.7049 40.41 17.9975C40.41 19.5337 38.5603 19.702 37.7634 19.702C36.2647 19.702 35.0364 19.0802 34.0129 17.7927L33.7716 17.4928L31.9805 19.3582L32.1559 19.5849C33.3988 21.2089 35.5628 22.2111 37.7927 22.2111C40.9583 22.2111 43.0931 20.4774 43.0931 17.8878C43.0931 15.8103 41.7332 14.435 39.0648 13.8059Z" fill="#1D2028"/><path d="M48.335 7.92969H45.6592V21.8945H48.335V7.92969Z" fill="#1D2028"/><path d="M60.1858 7.26578V7.93878H55.5141V7.26578C55.5141 5.38576 56.1283 4.72738 57.8683 4.72738H58.9064V2.25483L57.839 2.21825C54.5198 2.21825 52.8383 3.92271 52.8383 7.27309V7.9461H50.667V10.4479H52.8383V21.8963H55.5141V10.4479H60.1858V21.8963H62.8616V10.4479H65.9541V7.93147H62.8616V7.25846C62.8616 5.37844 63.4757 4.72007 65.2157 4.72007H66.2539V2.24751L65.1865 2.21094C61.8673 2.21094 60.1858 3.90808 60.1858 7.26578Z" fill="#1D2028"/><path d="M71.3799 2.21094H68.7041V21.9036H71.3799V2.21094Z" fill="#1D2028"/><path d="M83.9095 8.73592C82.9299 7.98977 81.7163 7.60938 80.2906 7.60938C78.3606 7.60938 76.7814 8.33359 75.6116 9.76737C74.4785 11.15 73.9082 12.9129 73.9082 14.9978C73.9082 17.0973 74.5296 18.8456 75.7579 20.1916C77.0007 21.523 78.6896 22.196 80.7732 22.196C82.9153 22.196 84.7503 21.2962 86.2125 19.5259L86.4172 19.2845L84.5383 17.5508L84.3116 17.8288C83.3101 19.0577 82.1549 19.6576 80.7732 19.6576C78.4337 19.6576 76.9495 18.2823 76.6644 15.8756H86.5196L86.5561 14.6174C86.5634 12.0424 85.6642 10.06 83.9095 8.73592ZM76.7814 13.4177C77.2201 11.3548 78.4995 10.177 80.3418 10.177C82.2207 10.177 83.5294 11.406 83.8218 13.4177H76.7814Z" fill="#1D2028"/><path d="M95.7024 10.4474V7.93099H92.6098V4.21484H89.934V7.93099H87.7627V10.4474H89.934V17.6603C89.934 20.5937 91.2646 21.9543 94.1159 21.9543C94.613 21.9543 95.0809 21.9251 95.388 21.8958L95.6951 21.8739V19.4013L94.306 19.4379C92.9681 19.4379 92.6025 18.9917 92.6025 17.3604V10.4474H95.7024Z" fill="#1D2028"/><path d="M48.3057 2.21094H45.6592V4.85906H48.3057V2.21094Z" fill="#E8154D"/><path d="M11.6196 4.85156C6.86748 4.85156 3 8.72133 3 13.4762C3 18.2312 6.86748 22.1009 11.6196 22.1009C16.3717 22.1009 20.2319 18.2312 20.2319 13.4762V7.8435H11.6196C8.51244 7.8435 5.99017 10.3673 5.99017 13.4762C5.99017 16.5852 8.51244 19.109 11.6196 19.109C14.7267 19.109 17.249 16.5852 17.249 13.4762C17.249 12.5179 17.0077 11.6182 16.5837 10.8281H14.8145C15.414 11.545 15.7722 12.474 15.7722 13.4762C15.7722 15.7659 13.9152 17.6313 11.6196 17.6313C9.33126 17.6313 7.46698 15.7659 7.46698 13.4762C7.46698 11.1866 9.33126 9.32118 11.6196 9.32118H18.755V13.4762C18.755 17.4118 15.5529 20.6159 11.6196 20.6159C7.6863 20.6159 4.48412 17.4118 4.48412 13.4762C4.48412 9.54063 7.6863 6.33656 11.6196 6.33656H25.5981V10.8281H21.7452V12.3058H27.0749V4.85156H11.6196Z" fill="url(#paint0_linear_292_1906)"/><defs><linearGradient id="paint0_linear_292_1906" x1="27.0749" y1="4.85156" x2="0.474526" y2="10.7917" gradientUnits="userSpaceOnUse"><stop stopColor="#E8154D"/><stop offset="1" stopColor="#A60F37"/></linearGradient></defs></svg>
+            </a>
+            <span style={{color:"var(--silver)",margin:"0 4px"}}>|</span>
+            <span style={{fontSize:"0.82rem",color:"var(--slate)",fontWeight:500}}>Shortlist Scorecard</span>
+          </div>
+          <span className="stat-pill">🔒 No account required</span>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <div className="hero-pattern" style={{flex:1,padding:"80px 0 60px"}}>
+        <div className="container" style={{maxWidth:720}}>
+          <div style={{marginBottom:16}}>
+            <span className="badge badge-red" style={{fontSize:"0.72rem",letterSpacing:"0.08em"}}>PROCUREMENT TOOL</span>
+          </div>
+          <h1 className="display" style={{marginBottom:20}}>
+            Most tools tell you what broke.<br/>
+            <em style={{color:"var(--razzmatazz)"}}>Few tell you why it matters.</em>
+          </h1>
+          <p style={{fontSize:"1.05rem",color:"var(--slate)",lineHeight:1.7,marginBottom:32,maxWidth:580}}>
+            Detection is table stakes. This scorecard helps your team evaluate data observability vendors on what actually drives business outcomes — triage quality, resolution speed, and business context — not just alert volume.
+          </p>
+
+          <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:36}}>
+            <span className="stat-pill">⏱ 3–6 min to complete</span>
+            <span className="stat-pill">📊 Score 2–6 vendors</span>
+            <span className="stat-pill">📋 Generates an evaluation memo</span>
+            <span className="stat-pill">🔗 Share without login</span>
+          </div>
+
+          <button className="btn btn-primary" style={{fontSize:"1rem",padding:"14px 32px"}} onClick={onStart}>
+            Start your evaluation →
+          </button>
+
+          <p style={{marginTop:20,fontSize:"0.78rem",color:"var(--slate)"}}>
+            Progress autosaved locally. No account, no email required. Export PDF or CSV to share.
+          </p>
+        </div>
+      </div>
+
+      {/* Principles */}
+      <div style={{background:"var(--ink)",padding:"48px 0"}}>
+        <div className="container">
+          <p style={{color:"rgba(255,255,255,0.4)",fontSize:"0.72rem",fontWeight:600,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:24}}>From the Sifflet Buyer's Guide</p>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:24}}>
+            {[
+              { n:"01", t:"Detection is table stakes", d:"Every serious vendor monitors freshness, volume, and schema. The real differentiator is what happens after detection." },
+              { n:"02", t:"Observability ≠ monitoring", d:"Monitoring in disguise fires alerts. True observability explains business impact and drives resolution." },
+              { n:"03", t:"The good enough trap", d:"A tool that catches technical issues but fails to contextualize them for business creates hidden, compounding risk." },
+            ].map(p => (
+              <div key={p.n} style={{borderLeft:"2px solid var(--razzmatazz)",paddingLeft:16}}>
+                <div style={{color:"rgba(255,255,255,0.3)",fontFamily:"var(--mono)",fontSize:"0.72rem",marginBottom:6}}>{p.n}</div>
+                <div style={{color:"#fff",fontWeight:600,marginBottom:6,fontSize:"0.92rem"}}>{p.t}</div>
+                <div style={{color:"rgba(255,255,255,0.6)",fontSize:"0.82rem",lineHeight:1.6}}>{p.d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SETUP PAGE
+// ============================================================
+const ROLES = ["Data Engineer","Analytics Engineer","Data Analyst","Head of Data / VP Data","Chief Data Officer","Procurement / IT","Other"];
+const SIZES = ["< 200 employees","200–1,000","1,001–5,000","5,001–20,000","20,000+"];
+const INDUSTRIES = ["Financial Services","Healthcare & Life Sciences","E-commerce & Retail","Media & Entertainment","SaaS / Technology","Manufacturing","Other"];
+const STACKS = ["Snowflake","Databricks","BigQuery","Redshift","Azure Synapse","Multiple / Hybrid","Other"];
+const MATURITY = ["Ad hoc / No formal observability","Basic monitoring (scripts/alerts)","Dedicated observability tool, 1–2 years","Mature program, 3+ years"];
+const RISK_DRIVERS = [
+  "Executive dashboard trust",
+  "Revenue reporting accuracy",
+  "Campaign attribution & segmentation",
+  "ML model reliability",
+  "Regulatory reporting & audit readiness",
+  "On-call fatigue reduction",
+];
+
+function Setup({ setup, onUpdate, onNext }) {
+  const [vendors, setVendors] = useState(setup.vendors || ["Sifflet","Vendor A","Vendor B"]);
+  const [count, setCount] = useState(setup.vendorCount || 3);
+  const [role, setRole] = useState(setup.role || "");
+  const [size, setSize] = useState(setup.companySize || "");
+  const [industry, setIndustry] = useState(setup.industry || "");
+  const [stack, setStack] = useState(setup.stack || "");
+  const [maturity, setMaturity] = useState(setup.maturity || "");
+  const [riskDriver, setRiskDriver] = useState(setup.riskDriver || "");
+
+  function updateCount(n) {
+    setCount(n);
+    const v = [...vendors];
+    while (v.length < n) v.push(`Vendor ${String.fromCharCode(64 + v.length)}`);
+    setVendors(v.slice(0, n));
+  }
+
+  function handleNext() {
+    const data = { vendors: vendors.slice(0,count), vendorCount:count, role, companySize:size, industry, stack, maturity, riskDriver };
+    onUpdate(data);
+    analytics.track("setup_completed", { vendor_count:count, role, company_size_band:size });
+    onNext();
+  }
+
+  const canProceed = role && size && vendors.slice(0,count).every(v => v.trim());
+
+  return (
+    <div style={{minHeight:"100vh",paddingBottom:60}}>
+      <TopNav step={1} total={4} label="Setup" />
+      <div className="container" style={{paddingTop:40,maxWidth:640}}>
+        <div style={{marginBottom:32}}>
+          <h2 style={{marginBottom:8}}>Set up your evaluation</h2>
+          <p style={{color:"var(--slate)",fontSize:"0.9rem"}}>We'll use this context to personalize your risk register and recommendations.</p>
+        </div>
+
+        {/* Vendor count */}
+        <div className="card" style={{marginBottom:20}}>
+          <label className="form-label">Number of vendors on your shortlist</label>
+          <div style={{display:"flex",gap:8,marginBottom:20}}>
+            {[2,3,4,5,6].map(n => (
+              <button key={n} className="btn btn-sm" onClick={() => updateCount(n)}
+                style={{minWidth:40, background: count===n ? "var(--ink)" : "var(--white)", color: count===n ? "#fff" : "var(--ink)"}}>
+                {n}
+              </button>
+            ))}
+          </div>
+
+          <label className="form-label">Vendor names</label>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+            {vendors.slice(0,count).map((v,i) => (
+              <div key={i}>
+                <input className="form-input" value={v} placeholder={`Vendor ${i+1}`}
+                  onChange={e => { const nv=[...vendors]; nv[i]=e.target.value; setVendors(nv); }}/>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Context */}
+        <div className="card" style={{marginBottom:20}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+            <div>
+              <label className="form-label">Your role *</label>
+              <select className="form-input form-select" value={role} onChange={e=>setRole(e.target.value)}>
+                <option value="">Select…</option>
+                {ROLES.map(r=><option key={r}>{r}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Company size *</label>
+              <select className="form-input form-select" value={size} onChange={e=>setSize(e.target.value)}>
+                <option value="">Select…</option>
+                {SIZES.map(s=><option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Industry</label>
+              <select className="form-input form-select" value={industry} onChange={e=>setIndustry(e.target.value)}>
+                <option value="">Select…</option>
+                {INDUSTRIES.map(s=><option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Primary data stack</label>
+              <select className="form-input form-select" value={stack} onChange={e=>setStack(e.target.value)}>
+                <option value="">Select…</option>
+                {STACKS.map(s=><option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div style={{gridColumn:"1/-1"}}>
+              <label className="form-label">Observability maturity</label>
+              <select className="form-input form-select" value={maturity} onChange={e=>setMaturity(e.target.value)}>
+                <option value="">Select…</option>
+                {MATURITY.map(s=><option key={s}>{s}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Risk driver */}
+        <div className="card" style={{marginBottom:32}}>
+          <label className="form-label">Primary risk driver for this evaluation</label>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:8}}>
+            {RISK_DRIVERS.map(rd => (
+              <button key={rd} className="answer-btn" onClick={() => setRiskDriver(rd)}
+                style={{textAlign:"left", padding:"10px 14px", fontSize:"0.82rem",
+                  background: riskDriver===rd ? "#EFF6FF" : "#fff",
+                  borderColor: riskDriver===rd ? "var(--ocean)" : "var(--silver)",
+                  color: riskDriver===rd ? "var(--ocean)" : "var(--slate)"
+                }}>
+                {rd}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button className="btn btn-primary" onClick={handleNext} disabled={!canProceed} style={{width:"100%",justifyContent:"center",padding:"14px"}}>
+          Begin scoring →
+        </button>
+        {!canProceed && <p style={{color:"var(--slate)",fontSize:"0.78rem",marginTop:8,textAlign:"center"}}>Fill in role, company size, and all vendor names to continue.</p>}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// TOP NAV
+// ============================================================
+function TopNav({ step, total, label }) {
+  const pct = (step / total) * 100;
+  return (
+    <div className="top-nav no-print">
+      <div className="container" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <a href="https://www.siffletdata.com" target="_blank" style={{display:"flex",alignItems:"center",textDecoration:"none"}}>
+              <svg width="80" height="20" viewBox="0 0 97 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M39.0648 13.8059L36.9738 13.3158C35.4312 12.972 35.2558 12.2185 35.2558 11.6845C35.2558 10.7628 36.1038 10.1483 37.3613 10.1483C38.5091 10.1483 39.6058 10.6896 40.6147 11.7576L40.8559 12.0137L42.669 10.0898L42.4497 9.86298C41.0168 8.37066 39.3499 7.61719 37.4929 7.61719C36.1769 7.61719 35.0291 7.99027 34.0641 8.71448C33.0771 9.46063 32.5727 10.4921 32.5727 11.7796C32.5727 13.901 33.9252 15.2982 36.601 15.9346L38.5822 16.3955C40.41 16.8271 40.41 17.7049 40.41 17.9975C40.41 19.5337 38.5603 19.702 37.7634 19.702C36.2647 19.702 35.0364 19.0802 34.0129 17.7927L33.7716 17.4928L31.9805 19.3582L32.1559 19.5849C33.3988 21.2089 35.5628 22.2111 37.7927 22.2111C40.9583 22.2111 43.0931 20.4774 43.0931 17.8878C43.0931 15.8103 41.7332 14.435 39.0648 13.8059Z" fill="#1D2028"/><path d="M48.335 7.92969H45.6592V21.8945H48.335V7.92969Z" fill="#1D2028"/><path d="M60.1858 7.26578V7.93878H55.5141V7.26578C55.5141 5.38576 56.1283 4.72738 57.8683 4.72738H58.9064V2.25483L57.839 2.21825C54.5198 2.21825 52.8383 3.92271 52.8383 7.27309V7.9461H50.667V10.4479H52.8383V21.8963H55.5141V10.4479H60.1858V21.8963H62.8616V10.4479H65.9541V7.93147H62.8616V7.25846C62.8616 5.37844 63.4757 4.72007 65.2157 4.72007H66.2539V2.24751L65.1865 2.21094C61.8673 2.21094 60.1858 3.90808 60.1858 7.26578Z" fill="#1D2028"/><path d="M71.3799 2.21094H68.7041V21.9036H71.3799V2.21094Z" fill="#1D2028"/><path d="M83.9095 8.73592C82.9299 7.98977 81.7163 7.60938 80.2906 7.60938C78.3606 7.60938 76.7814 8.33359 75.6116 9.76737C74.4785 11.15 73.9082 12.9129 73.9082 14.9978C73.9082 17.0973 74.5296 18.8456 75.7579 20.1916C77.0007 21.523 78.6896 22.196 80.7732 22.196C82.9153 22.196 84.7503 21.2962 86.2125 19.5259L86.4172 19.2845L84.5383 17.5508L84.3116 17.8288C83.3101 19.0577 82.1549 19.6576 80.7732 19.6576C78.4337 19.6576 76.9495 18.2823 76.6644 15.8756H86.5196L86.5561 14.6174C86.5634 12.0424 85.6642 10.06 83.9095 8.73592ZM76.7814 13.4177C77.2201 11.3548 78.4995 10.177 80.3418 10.177C82.2207 10.177 83.5294 11.406 83.8218 13.4177H76.7814Z" fill="#1D2028"/><path d="M95.7024 10.4474V7.93099H92.6098V4.21484H89.934V7.93099H87.7627V10.4474H89.934V17.6603C89.934 20.5937 91.2646 21.9543 94.1159 21.9543C94.613 21.9543 95.0809 21.9251 95.388 21.8958L95.6951 21.8739V19.4013L94.306 19.4379C92.9681 19.4379 92.6025 18.9917 92.6025 17.3604V10.4474H95.7024Z" fill="#1D2028"/><path d="M48.3057 2.21094H45.6592V4.85906H48.3057V2.21094Z" fill="#E8154D"/><path d="M11.6196 4.85156C6.86748 4.85156 3 8.72133 3 13.4762C3 18.2312 6.86748 22.1009 11.6196 22.1009C16.3717 22.1009 20.2319 18.2312 20.2319 13.4762V7.8435H11.6196C8.51244 7.8435 5.99017 10.3673 5.99017 13.4762C5.99017 16.5852 8.51244 19.109 11.6196 19.109C14.7267 19.109 17.249 16.5852 17.249 13.4762C17.249 12.5179 17.0077 11.6182 16.5837 10.8281H14.8145C15.414 11.545 15.7722 12.474 15.7722 13.4762C15.7722 15.7659 13.9152 17.6313 11.6196 17.6313C9.33126 17.6313 7.46698 15.7659 7.46698 13.4762C7.46698 11.1866 9.33126 9.32118 11.6196 9.32118H18.755V13.4762C18.755 17.4118 15.5529 20.6159 11.6196 20.6159C7.6863 20.6159 4.48412 17.4118 4.48412 13.4762C4.48412 9.54063 7.6863 6.33656 11.6196 6.33656H25.5981V10.8281H21.7452V12.3058H27.0749V4.85156H11.6196Z" fill="url(#paint0_linear_nav)"/><defs><linearGradient id="paint0_linear_nav" x1="27.0749" y1="4.85156" x2="0.474526" y2="10.7917" gradientUnits="userSpaceOnUse"><stop stopColor="#E8154D"/><stop offset="1" stopColor="#A60F37"/></linearGradient></defs></svg>
+            </a>
+            <span style={{color:"var(--silver)"}}>|</span>
+            <span style={{fontSize:"0.78rem",color:"var(--slate)",fontWeight:500}}>Shortlist Scorecard</span>
+          </div>
+        <div style={{flex:1,maxWidth:400}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+            <span style={{fontSize:"0.72rem",color:"var(--slate)",fontWeight:500}}>{label}</span>
+            <span style={{fontSize:"0.72rem",color:"var(--slate)"}}>{step}/{total}</span>
+          </div>
+          <ScoreBar value={pct} color="var(--razzmatazz)" height={3}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SCORING PAGE
+// ============================================================
+function Scoring({ setup, answers, onAnswer, onFinish }) {
+  const [activeSection, setActiveSection] = useState("A");
+  const vendors = setup.vendors || [];
+  const sections = CONFIG.sections;
+
+  const currentSectionQs = CONFIG.questions.filter(q => q.section === activeSection);
+  const sectionIdx = sections.findIndex(s => s.id === activeSection);
+
+  function isSectionComplete(sectionId) {
+    const qs = CONFIG.questions.filter(q => q.section === sectionId);
+    return qs.every(q => vendors.every(v => answers[v]?.[q.id] !== undefined));
+  }
+
+  function allComplete() {
+    return sections.every(s => isSectionComplete(s.id));
+  }
+
+  function handleFinish() {
+    analytics.track("results_viewed", { vendor_count: vendors.length, role: setup.role });
+    onFinish();
+  }
+
+  function answerKey(vendor, qid) {
+    return answers[vendor]?.[qid];
+  }
+
+  function handleAnswer(vendor, qid, val) {
+    onAnswer(vendor, qid, val);
+    analytics.track("question_answered", { section: qid[0] });
+  }
+
+  const completedSections = sections.filter(s => isSectionComplete(s.id)).length;
+
+  return (
+    <div style={{minHeight:"100vh",paddingBottom:80}}>
+      <TopNav step={2} total={4} label={`Scoring — ${completedSections}/${sections.length} sections done`} />
+
+      {/* Section nav */}
+      <div style={{background:"var(--white)",borderBottom:"1px solid var(--silver)",padding:"12px 0",overflowX:"auto"}} className="no-print">
+        <div className="container" style={{display:"flex",gap:6,minWidth:"max-content"}}>
+          {sections.map(sec => (
+            <button key={sec.id} className={`section-tab ${activeSection===sec.id?"active":""} ${isSectionComplete(sec.id)?"complete":""}`}
+              onClick={() => setActiveSection(sec.id)}>
+              {isSectionComplete(sec.id) ? "✓ " : ""}{sec.id}. {sec.label}
+              <span style={{marginLeft:4,fontSize:"0.7rem",color:"var(--slate)"}}>({sec.weight}%)</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="container" style={{paddingTop:32,maxWidth:860}}>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:16,gap:16}}>
+          <div>
+            <div style={{fontSize:"0.72rem",fontWeight:600,color:"var(--slate)",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4}}>
+              Section {activeSection} · {sections[sectionIdx]?.weight}% of total score
+            </div>
+            <h2 style={{fontSize:"1.4rem"}}>{sections.find(s=>s.id===activeSection)?.label}</h2>
+          </div>
+          <div style={{display:"flex",gap:8,flexShrink:0}}>
+            {sectionIdx > 0 && (
+              <button className="btn btn-secondary btn-sm" onClick={() => setActiveSection(sections[sectionIdx-1].id)}>← Prev</button>
+            )}
+            {sectionIdx < sections.length-1 && (
+              <button className="btn btn-primary btn-sm" onClick={() => setActiveSection(sections[sectionIdx+1].id)}>Next →</button>
+            )}
+          </div>
+        </div>
+
+        {/* Section intro */}
+        {sections.find(s=>s.id===activeSection)?.intro && (
+          <div style={{background:"var(--white)",border:"1px solid var(--silver)",borderLeft:"3px solid var(--razzmatazz)",borderRadius:"0 6px 6px 0",padding:"14px 18px",marginBottom:20}}>
+            <div style={{fontSize:"0.7rem",fontWeight:600,color:"var(--razzmatazz)",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:5}}>From the Buyer's Guide</div>
+            <p style={{fontSize:"0.85rem",color:"var(--slate)",lineHeight:1.7,margin:0}}>{sections.find(s=>s.id===activeSection).intro}</p>
+          </div>
+        )}
+
+        {/* Vendor headers */}
+        <div className="card-flat" style={{marginBottom:2,padding:"10px 16px",display:"grid",
+          gridTemplateColumns:`220px repeat(${vendors.length}, 1fr)`,gap:12}}>
+          <div style={{fontSize:"0.72rem",fontWeight:600,color:"var(--slate)",letterSpacing:"0.05em",textTransform:"uppercase"}}>Capability</div>
+          {vendors.map((v,i) => (
+            <div key={v} style={{display:"flex",alignItems:"center",gap:6}}>
+              <span className="vendor-dot" style={{background:CONFIG.vendorColors[i]}}/>
+              <span style={{fontWeight:600,fontSize:"0.85rem"}}>{v}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Questions */}
+        {currentSectionQs.map(q => (
+          <div key={q.id} className="question-block" style={{marginBottom:12}}>
+            <div className="question-header">
+              <div style={{flex:1}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                  <span className="mono" style={{fontSize:"0.72rem",color:"var(--slate)",fontWeight:500}}>{q.id}</span>
+                  {q.critical && <span className="badge badge-red" style={{fontSize:"0.68rem"}}>CRITICAL</span>}
+                </div>
+                <div style={{fontSize:"0.9rem",fontWeight:500,color:"var(--ink)",lineHeight:1.5}}>
+                  <Tooltip term={q.tooltip}>{q.prompt}</Tooltip>
+                </div>
+              </div>
+            </div>
+            <div className="question-body">
+              <div style={{display:"grid",gridTemplateColumns:`220px repeat(${vendors.length}, 1fr)`,gap:12,alignItems:"start"}}>
+                <div>
+                  <div className="ask-box">
+                    <div style={{fontWeight:600,marginBottom:3,fontSize:"0.72rem",textTransform:"uppercase",letterSpacing:"0.05em"}}>What to ask for:</div>
+                    {q.whatToAsk}
+                  </div>
+                </div>
+                {vendors.map((v,i) => (
+                  <div key={v}>
+                    <div className="answer-grid" style={{gridTemplateColumns:"1fr 1fr",gap:5}}>
+                      {CONFIG.choices.map(c => {
+                        const current = answerKey(v, q.id);
+                        const isSelected = current !== undefined && current !== null && String(current) === String(c.value);
+                        const selClass = c.value === "U" ? "selected-u" : `selected-${c.value}`;
+                        return (
+                          <button key={c.value} className={`answer-btn ${isSelected ? selClass : ""}`}
+                            onClick={() => handleAnswer(v, q.id, c.value === "U" ? "U" : c.value)}
+                            title={c.label}>
+                            {c.short}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Section footer */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:24,padding:"16px",background:"var(--white)",border:"1px solid var(--silver)",borderRadius:6}}>
+          <div style={{fontSize:"0.82rem",color:"var(--slate)"}}>
+            {isSectionComplete(activeSection)
+              ? <span style={{color:"var(--green)",fontWeight:600}}>✓ Section complete</span>
+              : <span>Answer all questions for all vendors to complete this section</span>}
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            {sectionIdx > 0 && (
+              <button className="btn btn-secondary btn-sm" onClick={() => setActiveSection(sections[sectionIdx-1].id)}>← Prev</button>
+            )}
+            {sectionIdx < sections.length-1 && (
+              <button className="btn btn-primary btn-sm" onClick={() => setActiveSection(sections[sectionIdx+1].id)}>
+                Next section →
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Completion banner — appears when all sections are done */}
+        {allComplete() && (
+          <div style={{marginTop:24,background:"var(--ink)",borderRadius:8,padding:"28px 32px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,flexWrap:"wrap"}}>
+            <div>
+              <div style={{color:"var(--razzmatazz)",fontWeight:600,fontSize:"0.8rem",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:6}}>All sections complete</div>
+              <h3 style={{color:"#fff",fontSize:"1.15rem",fontWeight:600,marginBottom:4}}>Your evaluation is ready.</h3>
+              <p style={{color:"rgba(255,255,255,0.6)",fontSize:"0.85rem",margin:0}}>
+                {vendors.length} vendor{vendors.length > 1 ? "s" : ""} scored across {sections.length} sections. View your ranked report, risk register, and recommended next steps.
+              </p>
+            </div>
+            <button className="btn btn-primary" style={{padding:"14px 28px",fontSize:"0.95rem",fontWeight:600,flexShrink:0,whiteSpace:"nowrap"}} onClick={handleFinish}>
+              View evaluation report →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// RADAR CHART — spider chart for section scores
+// ============================================================
+function RadarChart({ vendorScores, sections, size = 320 }) {
+  const cx = size / 2, cy = size / 2;
+  const R = size * 0.36;
+  const n = sections.length;
+  const vendors = vendorScores.map(vs => vs.name);
+
+  function polar(angle, r) {
+    return {
+      x: cx + r * Math.sin(angle),
+      y: cy - r * Math.cos(angle),
+    };
+  }
+
+  const angles = sections.map((_, i) => (i / n) * 2 * Math.PI);
+
+  function vendorPath(vs) {
+    return angles.map((a, i) => {
+      const pct = (vs.sectionScores[sections[i].id] || 0) / 100;
+      const p = polar(a, R * pct);
+      return `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+    }).join(" ") + " Z";
+  }
+
+  const gridLevels = [0.25, 0.5, 0.75, 1];
+  const colors = ["#E8003D","#0066CC","#00875A","#D97706","#7C3AED","#0F766E"];
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{overflow:"visible"}}>
+      {/* Grid rings */}
+      {gridLevels.map(lvl => (
+        <polygon key={lvl}
+          points={angles.map(a => { const p = polar(a, R * lvl); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(" ")}
+          fill="none" stroke="#E5E8EF" strokeWidth={1}/>
+      ))}
+      {/* Spokes */}
+      {angles.map((a, i) => {
+        const outer = polar(a, R);
+        return <line key={i} x1={cx} y1={cy} x2={outer.x.toFixed(1)} y2={outer.y.toFixed(1)} stroke="#E5E8EF" strokeWidth={1}/>;
+      })}
+      {/* Vendor paths */}
+      {vendorScores.map((vs, vi) => (
+        <path key={vs.name} d={vendorPath(vs)} fill={colors[vi]} fillOpacity={0.12} stroke={colors[vi]} strokeWidth={2} strokeLinejoin="round"/>
+      ))}
+      {/* Labels */}
+      {sections.map((sec, i) => {
+        const a = angles[i];
+        const labelR = R + 22;
+        const p = polar(a, labelR);
+        const anchor = p.x < cx - 4 ? "end" : p.x > cx + 4 ? "start" : "middle";
+        return (
+          <text key={sec.id} x={p.x.toFixed(1)} y={p.y.toFixed(1)} textAnchor={anchor}
+            dominantBaseline="middle" fontSize={10} fontFamily="IBM Plex Sans" fill="#6B7280" fontWeight={500}>
+            {sec.id}. {sec.label.split(" ").slice(0,2).join(" ")}
+          </text>
+        );
+      })}
+      {/* Legend */}
+      {vendorScores.map((vs, vi) => (
+        <g key={vs.name} transform={`translate(${10}, ${10 + vi * 18})`}>
+          <rect width={10} height={10} rx={2} fill={colors[vi]} opacity={0.85}/>
+          <text x={14} y={9} fontSize={10} fontFamily="IBM Plex Sans" fill="#1D2028" fontWeight={500}>{vs.name}</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+// ============================================================
+// HUBSPOT FORM GATE
+// ============================================================
+function HubSpotGate({ onUnlock, setup, vendorScores }) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName]   = useState("");
+  const [email, setEmail]         = useState("");
+  const [company, setCompany]     = useState("");
+  const [jobTitle, setJobTitle]   = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError]         = useState("");
+
+  // HubSpot portal + form IDs — swap these for production
+  const PORTAL_ID  = "YOUR_PORTAL_ID";
+  const FORM_GUID  = "YOUR_FORM_GUID";
+
+  const valid = firstName.trim() && lastName.trim() && email.includes("@") && company.trim();
+
+  async function handleSubmit() {
+    if (!valid) return;
+    setSubmitting(true);
+    setError("");
+
+    const topVendor = [...vendorScores].sort((a,b) => b.total - a.total)[0]?.name || "";
+    const fields = [
+      { name:"firstname",   value: firstName.trim() },
+      { name:"lastname",    value: lastName.trim() },
+      { name:"email",       value: email.trim() },
+      { name:"company",     value: company.trim() },
+      { name:"jobtitle",    value: jobTitle.trim() },
+      { name:"scorecard_role",      value: setup.role || "" },
+      { name:"scorecard_industry",  value: setup.industry || "" },
+      { name:"scorecard_stack",     value: setup.stack || "" },
+      { name:"scorecard_top_vendor",value: topVendor },
+    ];
+
+    try {
+      const res = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_GUID}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fields,
+            context: { pageUri: window.location.href, pageName: "Data Observability Scorecard" },
+          }),
+        }
+      );
+      // Accept 200 or 302 (redirect) as success; also treat network errors gracefully
+      if (res.ok || res.status === 302 || res.status === 0) {
+        analytics.track("gate_form_submitted", { role: setup.role, company_size: setup.companySize });
+        onUnlock({ firstName: firstName.trim(), email: email.trim() });
+      } else {
+        // In local / dev mode the HS call will fail — unlock anyway so the demo works
+        analytics.track("gate_form_submitted_fallback");
+        onUnlock({ firstName: firstName.trim(), email: email.trim() });
+      }
+    } catch {
+      // Network blocked (CORS in dev, etc.) — still unlock
+      onUnlock({ firstName: firstName.trim(), email: email.trim() });
+    }
+    setSubmitting(false);
+  }
+
+  const sorted = [...vendorScores].sort((a,b) => b.total - a.total);
+
+  return (
+    <div style={{minHeight:"100vh", background:"var(--ice)", paddingBottom:80}}>
+      <TopNav step={4} total={4} label="Your results are ready" />
+
+      <div className="container" style={{paddingTop:48, maxWidth:860}}>
+
+        {/* ── Overview header ─────────────────────────────────────── */}
+        <div style={{marginBottom:8}}>
+          <span className="badge badge-red" style={{fontSize:"0.7rem",letterSpacing:"0.08em"}}>EVALUATION COMPLETE</span>
+        </div>
+        <h2 style={{marginBottom:6}}>Your shortlist evaluation is done.</h2>
+        <p style={{color:"var(--slate)", fontSize:"0.9rem", marginBottom:32, maxWidth:560}}>
+          Here's your headline summary. Your full report — detailed visual scorecard, per-vendor risk register, and recommended demo questions — is one step below.
+        </p>
+
+        {/* ── Ranking podium ─────────────────────────────────────── */}
+        <div style={{display:"grid", gridTemplateColumns:`repeat(${sorted.length}, 1fr)`, gap:12, marginBottom:32}}>
+          {sorted.map((vs, i) => {
+            const color = CONFIG.vendorColors[vendorScores.findIndex(x=>x.name===vs.name)];
+            const isTop = i === 0;
+            return (
+              <div key={vs.name} style={{
+                background: isTop ? "var(--ink)" : "var(--white)",
+                border: `1px solid ${isTop ? "var(--ink)" : "var(--silver)"}`,
+                borderRadius:8, padding:"20px 16px", textAlign:"center",
+                position:"relative", transition:"all 0.2s"
+              }}>
+                {isTop && (
+                  <div style={{position:"absolute", top:-11, left:"50%", transform:"translateX(-50%)",
+                    background:"var(--razzmatazz)", color:"#fff", fontSize:"0.65rem", fontWeight:700,
+                    letterSpacing:"0.1em", padding:"3px 10px", borderRadius:2}}>LEADING</div>
+                )}
+                <div style={{marginBottom:12}}>
+                  <ScoreCircle value={vs.total} size={80} color={isTop ? "#E8003D" : color}/>
+                </div>
+                <div style={{fontWeight:700, fontSize:"0.95rem", color: isTop ? "#fff" : "var(--ink)", marginBottom:4}}>{vs.name}</div>
+                <ConfidenceDot value={vs.confidence}/>
+                <div style={{marginTop:12, display:"flex", flexDirection:"column", gap:4}}>
+                  {CONFIG.sections.map(sec => {
+                    const pct = vs.sectionScores[sec.id] || 0;
+                    const c = pct >= 70 ? "#00875A" : pct >= 50 ? "#D97706" : "#DC2626";
+                    return (
+                      <div key={sec.id} style={{display:"flex", alignItems:"center", gap:6}}>
+                        <span style={{fontSize:"0.68rem", fontFamily:"var(--mono)", color: isTop ? "rgba(255,255,255,0.5)" : "var(--slate)", width:14, textAlign:"right"}}>{sec.id}</span>
+                        <div style={{flex:1, height:5, background: isTop ? "rgba(255,255,255,0.1)" : "var(--silver)", borderRadius:3, overflow:"hidden"}}>
+                          <div style={{height:"100%", width:`${pct}%`, background: isTop ? "#E8003D" : c, borderRadius:3}}/>
+                        </div>
+                        <span style={{fontSize:"0.68rem", fontFamily:"var(--mono)", color: isTop ? "rgba(255,255,255,0.7)" : c, width:22}}>{pct}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Key signals (free) ──────────────────────────────────── */}
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:36}}>
+          {[
+            { label:"Vendors evaluated", value: vendorScores.length, unit:"" },
+            { label:"Sections covered", value:6, unit:"criteria areas" },
+            { label:"Leading score", value: sorted[0]?.total, unit:"/ 100" },
+          ].map(s => (
+            <div key={s.label} className="card" style={{textAlign:"center", padding:"16px 12px"}}>
+              <div style={{fontFamily:"var(--mono)", fontSize:"1.8rem", fontWeight:700, color:"var(--razzmatazz)", lineHeight:1}}>{s.value}</div>
+              <div style={{fontSize:"0.7rem", color:"var(--slate)", marginTop:4}}>{s.unit && <span style={{fontFamily:"var(--mono)", fontSize:"0.75rem", color:"var(--slate)"}}>{s.unit} </span>}{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Gate: what's inside ─────────────────────────────────── */}
+        <div style={{
+          background:"var(--white)", border:"1px solid var(--silver)",
+          borderRadius:10, overflow:"hidden", marginBottom:40,
+        }}>
+          {/* Teaser banner */}
+          <div style={{
+            background: "linear-gradient(135deg, var(--ink) 0%, #1a2540 100%)",
+            padding:"28px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:24, flexWrap:"wrap"
+          }}>
+            <div>
+              <div style={{color:"var(--razzmatazz)", fontSize:"0.7rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8}}>Full report — unlock free</div>
+              <h3 style={{color:"#fff", fontSize:"1.1rem", marginBottom:8}}>Get the detailed evaluation memo your team can act on.</h3>
+              <div style={{display:"flex", flexWrap:"wrap", gap:16, marginTop:4}}>
+                {[
+                  "Visual radar scorecard",
+                  "Per-vendor risk register",
+                  "Capability gap analysis",
+                  "Recommended demo questions",
+                  "Team-ready email summary",
+                  "Shareable link (no login)",
+                ].map(f => (
+                  <span key={f} style={{display:"flex", alignItems:"center", gap:5, color:"rgba(255,255,255,0.75)", fontSize:"0.8rem"}}>
+                    <span style={{color:"var(--razzmatazz)", fontWeight:700}}>✓</span> {f}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* Blurred preview hint */}
+            <div style={{position:"relative", flexShrink:0}}>
+              <div style={{
+                width:180, height:120, background:"rgba(255,255,255,0.05)",
+                borderRadius:8, border:"1px solid rgba(255,255,255,0.1)",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                filter:"blur(2px)", overflow:"hidden", padding:12,
+              }}>
+                <RadarChart vendorScores={vendorScores.slice(0,2)} sections={CONFIG.sections} size={160}/>
+              </div>
+              <div style={{
+                position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center",
+                background:"rgba(10,15,30,0.5)", borderRadius:8,
+              }}>
+                <span style={{color:"#fff", fontSize:"0.78rem", fontWeight:600, letterSpacing:"0.04em"}}>🔒 Unlock below</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Form */}
+          <div style={{padding:"32px"}}>
+            <p style={{fontSize:"0.82rem", color:"var(--slate)", marginBottom:24, maxWidth:480}}>
+              Enter your details below. We'll also send your report by email so you can share it with your team.
+              No spam — ever.
+            </p>
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14}}>
+              <div>
+                <label className="form-label">First name *</label>
+                <input className="form-input" value={firstName} onChange={e=>setFirstName(e.target.value)} placeholder="Alex"/>
+              </div>
+              <div>
+                <label className="form-label">Last name *</label>
+                <input className="form-input" value={lastName} onChange={e=>setLastName(e.target.value)} placeholder="Chen"/>
+              </div>
+              <div>
+                <label className="form-label">Work email *</label>
+                <input className="form-input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="alex@company.com"/>
+              </div>
+              <div>
+                <label className="form-label">Company *</label>
+                <input className="form-input" value={company} onChange={e=>setCompany(e.target.value)} placeholder="Acme Corp"/>
+              </div>
+              <div style={{gridColumn:"1/-1"}}>
+                <label className="form-label">Job title</label>
+                <input className="form-input" value={jobTitle} onChange={e=>setJobTitle(e.target.value)} placeholder="Head of Data"/>
+              </div>
+            </div>
+
+            {error && <p style={{color:"var(--red)", fontSize:"0.82rem", marginBottom:12}}>{error}</p>}
+
+            <div style={{display:"flex", alignItems:"center", gap:16, flexWrap:"wrap"}}>
+              <button className="btn btn-primary" style={{padding:"13px 28px", fontSize:"0.92rem"}}
+                onClick={handleSubmit} disabled={!valid || submitting}>
+                {submitting ? "Sending…" : "Unlock my full report →"}
+              </button>
+              <p style={{fontSize:"0.72rem", color:"var(--slate)", margin:0, maxWidth:300}}>
+                By submitting, you agree to Sifflet's privacy policy. Your evaluation data stays in your browser.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// FULL REPORT (post-gate)
+// ============================================================
+function FullReport({ setup, answers, onBack, user }) {
+  const [activeVendor, setActiveVendor] = useState(null);
+  const [copied, setCopied]     = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
+  const vendors = setup.vendors || [];
+
+  const vendorScores = useMemo(() =>
+    vendors.map(v => ({ name:v, ...scoreVendor(answers[v]||{}, CONFIG.sections, CONFIG.questions) }))
+  , [vendors, answers]);
+
+  const vendorRisks = useMemo(() => {
+    const out = {};
+    vendors.forEach(v => {
+      const s = vendorScores.find(vs=>vs.name===v);
+      out[v] = generateRisks(v, answers[v]||{}, s, CONFIG.sections, CONFIG.questions, CONFIG);
+    });
+    return out;
+  }, [vendors, answers, vendorScores]);
+
+  const vendorStrengths = useMemo(() => {
+    const out = {};
+    vendors.forEach(v => {
+      const s = vendorScores.find(vs=>vs.name===v);
+      out[v] = generateStrengths(answers[v]||{}, s, CONFIG.sections, CONFIG.questions);
+    });
+    return out;
+  }, [vendors, answers, vendorScores]);
+
+  const vendorNextQs = useMemo(() => {
+    const out = {};
+    vendors.forEach(v => {
+      const s = vendorScores.find(vs=>vs.name===v);
+      out[v] = generateNextQuestions(answers[v]||{}, s, CONFIG.sections, CONFIG.questions);
+    });
+    return out;
+  }, [vendors, answers, vendorScores]);
+
+  const sorted = [...vendorScores].sort((a,b) => b.total - a.total);
+  const winner = sorted[0];
+  const av = activeVendor || vendors[0];
+  const avScores = vendorScores.find(vs=>vs.name===av);
+
+  function shareUrl() { return buildShareUrl({ setup, answers, step:"results" }); }
+
+  function copyShare() {
+    navigator.clipboard.writeText(shareUrl()).then(() => {
+      setCopied(true); setTimeout(()=>setCopied(false),2000);
+      analytics.track("share_link_copied", { vendor_count: vendors.length });
+    });
+  }
+
+  function exportCSV() {
+    analytics.track("export_clicked", { type:"csv", vendor_count: vendors.length });
+    const rows = [["Section","Question",...vendors]];
+    CONFIG.sections.forEach(sec =>
+      CONFIG.questions.filter(q=>q.section===sec.id).forEach(q =>
+        rows.push([sec.label, q.prompt, ...vendors.map(v=>answers[v]?.[q.id]??"")])
+      )
+    );
+    rows.push([],["","TOTAL SCORE",...vendorScores.map(vs=>vs.total)],["","CONFIDENCE",...vendorScores.map(vs=>vs.confidence)]);
+    const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+    a.download = "sifflet-scorecard.csv"; a.click();
+  }
+
+  const emailText =
+`Hi team,
+
+I've completed our data observability vendor evaluation using the Sifflet Shortlist Scorecard.
+
+RANKING
+${sorted.map((vs,i)=>`${i+1}. ${vs.name} — Score: ${vs.total}/100  |  Confidence: ${vs.confidence}/100`).join("\n")}
+
+LEADING VENDOR
+${winner.name} scored highest (${winner.total}/100). ${vendorStrengths[winner.name]?.[0]||""}
+
+KEY RISKS TO VALIDATE BEFORE DECIDING
+${Object.entries(vendorRisks).map(([v,risks])=>risks.slice(0,2).map(r=>`• ${v}: ${r.title}`).join("\n")).filter(Boolean).join("\n")}
+
+RECOMMENDED NEXT STEP
+Structured demo session with ${sorted.slice(0,2).map(v=>v.name).join(" and ")} focused on triage and resolution workflows.
+
+Full interactive report: ${shareUrl()}
+
+Generated with Sifflet Shortlist Scorecard — siffletdata.com`;
+
+  function copyEmail() {
+    navigator.clipboard.writeText(emailText).then(() => {
+      setEmailCopied(true); setTimeout(()=>setEmailCopied(false),2500);
+    });
+  }
+
+  const date = new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+
+  return (
+    <div style={{minHeight:"100vh", paddingBottom:80}}>
+      <TopNav step={4} total={4} label="Full Evaluation Report" />
+
+      <div className="container-wide" style={{paddingTop:36}}>
+
+        {/* ── Report header ───────────────────────────────────────── */}
+        <div style={{marginBottom:28, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:16}}>
+          <div>
+            <p style={{fontSize:"0.7rem", fontWeight:600, color:"var(--slate)", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:5}}>
+              Evaluation Report · {date} · Prepared for {user?.firstName || "your team"}
+            </p>
+            <h2 style={{marginBottom:4}}>Data Observability Shortlist</h2>
+            <p style={{color:"var(--slate)", fontSize:"0.85rem"}}>
+              {setup.role} · {setup.companySize} · {setup.industry||"Technology"} · Primary risk: <strong>{setup.riskDriver||"Not specified"}</strong>
+            </p>
+          </div>
+          <div style={{display:"flex", gap:8, flexWrap:"wrap"}} className="no-print">
+            <button className="btn btn-secondary btn-sm" onClick={onBack}>← Edit scores</button>
+            <button className="btn btn-secondary btn-sm" onClick={exportCSV}>Export CSV</button>
+            <button className="btn btn-primary btn-sm" onClick={copyShare}>{copied?"✓ Copied!":"🔗 Share link"}</button>
+          </div>
+        </div>
+
+        {/* ── Framing bar ─────────────────────────────────────────── */}
+        <div style={{background:"var(--ink)", color:"#fff", borderRadius:8, padding:"18px 24px", marginBottom:28, display:"flex", gap:20, flexWrap:"wrap", alignItems:"center"}}>
+          <p style={{flex:1, fontSize:"0.85rem", lineHeight:1.7, color:"rgba(255,255,255,0.8)", margin:0}}>
+            Detection is table stakes. This report evaluates vendors on <strong style={{color:"#fff"}}>triage quality</strong>, <strong style={{color:"#fff"}}>resolution velocity</strong>, and <strong style={{color:"#fff"}}>business context</strong> — the capabilities that separate observability from monitoring in disguise.
+          </p>
+          <div style={{display:"flex", gap:14, flexShrink:0}}>
+            {sorted.map((vs,i) => (
+              <div key={vs.name} style={{textAlign:"center"}}>
+                <ScoreCircle value={vs.total} size={60} color={i===0?"#E8003D":"rgba(255,255,255,0.4)"}/>
+                <div style={{fontSize:"0.68rem", color:"rgba(255,255,255,0.55)", marginTop:3}}>{vs.name}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Visual radar + ranking side by side ─────────────────── */}
+        <div style={{display:"grid", gridTemplateColumns:"auto 1fr", gap:20, marginBottom:28, alignItems:"start"}}>
+          <div className="card" style={{padding:20}}>
+            <div style={{fontSize:"0.72rem", fontWeight:600, color:"var(--slate)", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:12}}>Capability radar</div>
+            <RadarChart vendorScores={vendorScores} sections={CONFIG.sections} size={300}/>
+          </div>
+
+          <div style={{display:"flex", flexDirection:"column", gap:12}}>
+            {sorted.map((vs, i) => {
+              const color = CONFIG.vendorColors[vendors.indexOf(vs.name)];
+              return (
+                <div key={vs.name} className="card" style={{
+                  borderLeft:`3px solid ${i===0?"var(--razzmatazz)":color}`,
+                  padding:"16px 20px", cursor:"pointer",
+                  background: av===vs.name ? "var(--ice)" : "var(--white)"
+                }} onClick={()=>setActiveVendor(vs.name)}>
+                  <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10}}>
+                    <div style={{display:"flex", alignItems:"center", gap:8}}>
+                      <span className="vendor-dot" style={{background:color, width:10, height:10}}/>
+                      <span style={{fontWeight:700, fontSize:"0.95rem"}}>{vs.name}</span>
+                      {i===0 && <span className="badge badge-green" style={{fontSize:"0.65rem"}}>LEADING</span>}
+                    </div>
+                    <div style={{display:"flex", alignItems:"center", gap:12}}>
+                      <ConfidenceDot value={vs.confidence}/>
+                      <span style={{fontFamily:"var(--mono)", fontWeight:800, fontSize:"1.3rem", color:i===0?"var(--razzmatazz)":color}}>{vs.total}</span>
+                      <span style={{color:"var(--slate)", fontSize:"0.72rem"}}>/100</span>
+                    </div>
+                  </div>
+                  <div style={{display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:4}}>
+                    {CONFIG.sections.map(sec => {
+                      const pct = vs.sectionScores[sec.id]||0;
+                      const c = pct>=70?"#00875A":pct>=50?"#D97706":"#DC2626";
+                      return (
+                        <div key={sec.id} style={{textAlign:"center"}}>
+                          <div style={{height:32, display:"flex", alignItems:"flex-end", justifyContent:"center", marginBottom:2}}>
+                            <div style={{width:18, background:c, borderRadius:"2px 2px 0 0", height:`${Math.max(4, pct*0.32)}px`}}/>
+                          </div>
+                          <div style={{fontSize:"0.62rem", fontFamily:"var(--mono)", color:"var(--slate)"}}>{sec.id}</div>
+                          <div style={{fontSize:"0.65rem", fontWeight:600, color:c, fontFamily:"var(--mono)"}}>{pct}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Comparison table ────────────────────────────────────── */}
+        <div className="card" style={{marginBottom:28, overflowX:"auto"}}>
+          <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14}}>
+            <h3>Section-by-section comparison</h3>
+            <span style={{fontSize:"0.72rem", color:"var(--slate)"}}>Click a row to drill into that vendor</span>
+          </div>
+          <table className="comparison-table">
+            <thead>
+              <tr>
+                <th>Vendor</th>
+                {CONFIG.sections.map(s=><th key={s.id}>{s.label}</th>)}
+                <th>Total</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((vs,i)=>{
+                const color = CONFIG.vendorColors[vendors.indexOf(vs.name)];
+                return (
+                  <tr key={vs.name} style={{cursor:"pointer"}} onClick={()=>setActiveVendor(vs.name)}>
+                    <td>
+                      <div style={{display:"flex", alignItems:"center", gap:8}}>
+                        <span className="vendor-dot" style={{background:color}}/>
+                        <strong>{vs.name}</strong>
+                        {i===0&&<span className="badge badge-green" style={{fontSize:"0.65rem"}}>LEADING</span>}
+                      </div>
+                    </td>
+                    {CONFIG.sections.map(s=>{
+                      const pct = vs.sectionScores[s.id]||0;
+                      const c = pct>=70?"#00875A":pct>=50?"#D97706":"#DC2626";
+                      return (
+                        <td key={s.id}>
+                          <div style={{display:"flex", alignItems:"center", gap:6}}>
+                            <div style={{flex:1, maxWidth:56}}><ScoreBar value={pct} color={c} height={6}/></div>
+                            <span style={{fontSize:"0.78rem", fontFamily:"var(--mono)", color:c, fontWeight:600, minWidth:22}}>{pct}</span>
+                          </div>
+                        </td>
+                      );
+                    })}
+                    <td><span style={{fontFamily:"var(--mono)", fontWeight:700, fontSize:"1rem", color:i===0?"var(--razzmatazz)":"var(--ink)"}}>{vs.total}</span><span style={{color:"var(--slate)", fontSize:"0.7rem"}}>/100</span></td>
+                    <td><ConfidenceDot value={vs.confidence}/></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ── Per-vendor detail tabs ───────────────────────────────── */}
+        <div style={{display:"flex", gap:8, flexWrap:"wrap", marginBottom:16}} className="no-print">
+          {vendors.map((v,i)=>(
+            <button key={v} className={`section-tab ${av===v?"active":""}`} onClick={()=>setActiveVendor(v)}
+              style={{display:"flex", alignItems:"center", gap:6}}>
+              <span className="vendor-dot" style={{background:CONFIG.vendorColors[i]}}/>
+              {v}
+            </button>
+          ))}
+        </div>
+
+        {avScores && (
+          <div key={av} className="fade-up">
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:16}}>
+
+              {/* Strengths */}
+              <div className="card">
+                <h3 style={{marginBottom:12, color:"var(--green)"}}>✓ Strengths — {av}</h3>
+                {vendorStrengths[av]?.length>0
+                  ? vendorStrengths[av].map((s,i)=>(
+                    <div key={i} style={{padding:"8px 0", borderBottom:"1px solid var(--silver)", fontSize:"0.84rem", display:"flex", gap:8}}>
+                      <span style={{color:"var(--green)", flexShrink:0}}>→</span>{s}
+                    </div>
+                  ))
+                  : <p style={{color:"var(--slate)", fontSize:"0.84rem"}}>No notable strengths detected from answers.</p>}
+              </div>
+
+              {/* Risk register */}
+              <div className="card">
+                <h3 style={{marginBottom:12, color:"var(--red)"}}>⚠ Risk Register — {av}</h3>
+                {vendorRisks[av]?.length>0
+                  ? vendorRisks[av].slice(0,5).map((r,i)=>(
+                    <div key={i} className={`risk-item ${r.severity}`} style={{marginBottom:8}}>
+                      <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:4}}>
+                        <RiskBadge severity={r.severity}/>
+                        <span style={{fontSize:"0.82rem", fontWeight:600}}>{r.title}</span>
+                      </div>
+                      <p style={{fontSize:"0.78rem", color:"var(--slate)", marginBottom:4, lineHeight:1.5}}>{r.business}</p>
+                      <div style={{fontSize:"0.72rem", color:"var(--ocean)"}}>
+                        📖 <a href={`${CONFIG.buyersGuideBase}${CONFIG.chapterUrls[r.chapterKey]||""}`} target="_blank" style={{color:"var(--ocean)"}}>
+                          Buyer's Guide — {CONFIG.sections.find(s=>s.id===r.section)?.label||r.chapterKey}
+                        </a>
+                      </div>
+                    </div>
+                  ))
+                  : <p style={{color:"var(--green)", fontSize:"0.84rem"}}>No significant risks identified. Validate with a structured demo.</p>}
+              </div>
+            </div>
+
+            {/* Section breakdown bars */}
+            <div className="card" style={{marginBottom:16}}>
+              <h3 style={{marginBottom:16}}>Section breakdown — {av}</h3>
+              <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap:14}}>
+                {CONFIG.sections.map(sec=>{
+                  const pct = avScores.sectionScores[sec.id]||0;
+                  const c = pct>=70?"#00875A":pct>=50?"#D97706":"#DC2626";
+                  return (
+                    <div key={sec.id} style={{padding:14, background:"var(--ice)", borderRadius:6}}>
+                      <div style={{fontSize:"0.7rem", color:"var(--slate)", fontWeight:600, letterSpacing:"0.05em", textTransform:"uppercase", marginBottom:6}}>{sec.id}. {sec.label}</div>
+                      <ScoreBar value={pct} color={c}/>
+                      <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:6}}>
+                        <span style={{fontFamily:"var(--mono)", fontWeight:700, color:c}}>{pct}/100</span>
+                        <span style={{fontSize:"0.68rem", color:"var(--slate)"}}>{sec.weight}% weight</span>
+                      </div>
+                      {pct < sec.threshold && (
+                        <div style={{fontSize:"0.68rem", color:"var(--red)", marginTop:4}}>Below threshold — needs demo validation</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Recommended demo questions */}
+            <div className="card" style={{marginBottom:16}}>
+              <h3 style={{marginBottom:4}}>Recommended demo questions — {av}</h3>
+              <p style={{color:"var(--slate)", fontSize:"0.8rem", marginBottom:14}}>Ask these in your next session. Each is designed to reveal gaps the vendor won't volunteer.</p>
+              {vendorNextQs[av]?.map((nq,i)=>(
+                <div key={i} style={{display:"flex", gap:12, padding:"10px 14px", background:i%2===0?"var(--ice)":"var(--white)", borderRadius:4, fontSize:"0.84rem", marginBottom:2}}>
+                  <span style={{fontFamily:"var(--mono)", fontSize:"0.7rem", color:"var(--slate)", fontWeight:600, minWidth:18, paddingTop:2}}>{i+1}.</span>
+                  <span style={{lineHeight:1.6}}>{nq}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Share + email ───────────────────────────────────────── */}
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:28}}>
+          <div className="share-box">
+            <h3 style={{color:"#fff", marginBottom:6}}>Share this evaluation</h3>
+            <p style={{color:"rgba(255,255,255,0.5)", fontSize:"0.78rem", marginBottom:12}}>Anyone with the link can view results — no account required.</p>
+            <div style={{display:"flex", gap:8}}>
+              <input readOnly value={shareUrl()} style={{flex:1, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.15)", color:"#fff", borderRadius:4, padding:"8px 12px", fontSize:"0.72rem", fontFamily:"var(--mono)", outline:"none"}}/>
+              <button className="btn btn-primary btn-sm" onClick={copyShare}>{copied?"✓ Copied":"Copy"}</button>
+            </div>
+          </div>
+          <div className="card">
+            <h3 style={{marginBottom:6}}>Send to your team</h3>
+            <p style={{color:"var(--slate)", fontSize:"0.78rem", marginBottom:10}}>Ready-to-paste summary email.</p>
+            <textarea readOnly value={emailText} rows={5}
+              style={{width:"100%", padding:10, border:"1.5px solid var(--silver)", borderRadius:4, fontSize:"0.72rem", fontFamily:"var(--mono)", resize:"none", outline:"none", color:"var(--ink)", background:"var(--ice)"}}/>
+            <button className="btn btn-secondary btn-sm" style={{marginTop:8}} onClick={copyEmail}>
+              {emailCopied?"✓ Copied!":"Copy email text"}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Sifflet CTA ─────────────────────────────────────────── */}
+        <div style={{background:"var(--razzmatazz)", color:"#fff", borderRadius:8, padding:"28px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:20}}>
+          <div>
+            <h3 style={{color:"#fff", fontSize:"1.15rem", marginBottom:6}}>Ready to see Sifflet walk through every one of these questions?</h3>
+            <p style={{color:"rgba(255,255,255,0.8)", fontSize:"0.85rem"}}>Book a working session and we'll run the scorecard live — with your stack, your scenarios, your data.</p>
+          </div>
+          <a href="https://www.siffletdata.com/book-demo" target="_blank" className="btn"
+            style={{background:"#fff", color:"var(--razzmatazz)", borderColor:"#fff", fontWeight:600, flexShrink:0, whiteSpace:"nowrap"}}>
+            Book a demo →
+          </a>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// RESULTS — orchestrates gate → full report
+// ============================================================
+function Results({ setup, answers, onBack }) {
+  const vendors = setup.vendors || [];
+  const vendorScores = useMemo(() =>
+    vendors.map(v => ({ name:v, ...scoreVendor(answers[v]||{}, CONFIG.sections, CONFIG.questions) }))
+  , [vendors, answers]);
+
+  const [unlocked, setUnlocked] = useState(() => {
+    try { return !!JSON.parse(localStorage.getItem("sifflet-gate-user")); } catch { return false; }
+  });
+  const [gateUser, setGateUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("sifflet-gate-user")); } catch { return null; }
+  });
+
+  function handleUnlock(user) {
+    localStorage.setItem("sifflet-gate-user", JSON.stringify(user));
+    setGateUser(user);
+    setUnlocked(true);
+    analytics.track("full_report_unlocked", { role: setup.role });
+  }
+
+  if (!unlocked) {
+    return <HubSpotGate onUnlock={handleUnlock} setup={setup} vendorScores={vendorScores}/>;
+  }
+  return <FullReport setup={setup} answers={answers} onBack={onBack} user={gateUser}/>;
+}
+
+// ============================================================
+// APP ROOT
+// ============================================================
+const INITIAL_STATE = {
+  step: "landing",
+  setup: {},
+  answers: {},
+};
+
+function App() {
+  const [state, setState] = useLocalStorage("sifflet-scorecard-v1", INITIAL_STATE);
+
+  // Check URL for shared state
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get("s");
+    if (s) {
+      const decoded = decodeState(s);
+      if (decoded) {
+        setState({ ...decoded });
+      }
+    }
+  }, []);
+
+  function goTo(step) { setState(s => ({...s, step})); }
+
+  function handleSetupUpdate(setup) { setState(s => ({...s, setup})); }
+
+  function handleAnswer(vendor, qid, val) {
+    setState(s => ({
+      ...s,
+      answers: {
+        ...s.answers,
+        [vendor]: { ...(s.answers[vendor]||{}), [qid]: val }
+      }
+    }));
+  }
+
+  function reset() {
+    if (window.confirm("Reset and start over?")) {
+      setState(INITIAL_STATE);
+    }
+  }
+
+  const { step, setup, answers } = state;
+
+  if (step === "landing") {
+    return <Landing onStart={() => { analytics.track("scorecard_started"); goTo("setup"); }}/>;
+  }
+  if (step === "setup") {
+    return <Setup setup={setup} onUpdate={handleSetupUpdate} onNext={() => goTo("scoring")}/>;
+  }
+  if (step === "scoring") {
+    return <Scoring setup={setup} answers={answers} onAnswer={handleAnswer} onFinish={() => goTo("results")}/>;
+  }
+  if (step === "results") {
+    return <Results setup={setup} answers={answers} onBack={() => goTo("scoring")}/>;
+  }
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
