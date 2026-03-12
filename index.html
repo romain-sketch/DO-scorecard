@@ -711,9 +711,9 @@ function Report({ setup, answers, onBack }) {
 
   function exportCSV() {
     const rows=[["Section","Question",...vendors]];
-    SECTIONS.forEach(sec=>QUESTIONS.filter(q=>q.section===sec.id).forEach(q=>rows.push([sec.label,q.prompt,...vendors.map(v=>answers[v]?.[q.id]??")])));
+    SECTIONS.forEach(sec=>QUESTIONS.filter(q=>q.section===sec.id).forEach(q=>rows.push([sec.label,q.prompt,...vendors.map(v=>{ const a=answers[v] && answers[v][q.id]; return a===undefined||a===null?"":a; })])));
     rows.push([],["","TOTAL",...vendorScores.map(vs=>vs.total)],["","CONFIDENCE",...vendorScores.map(vs=>vs.confidence)]);
-    const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\n");
     const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="sifflet-scorecard.csv"; a.click();
   }
 
